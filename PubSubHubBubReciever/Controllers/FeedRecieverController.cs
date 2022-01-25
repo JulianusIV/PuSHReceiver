@@ -53,6 +53,12 @@ namespace PubSubHubBubReciever.Controllers
         [Consumes("application/xml")]
         public IActionResult Post()
         {
+            if (!FeedSubscriber.IsSubscribed)
+            {
+                Console.WriteLine("Incoming HTTP-POST without subscription! Ignoring.");
+                return StatusCode(418);
+            }
+
             var headerHash = HttpContext.Request.Headers["X-Hub-Signature"].ToString().Replace("sha1=", "");
 
             using var sr = new StreamReader(HttpContext.Request.Body);
@@ -76,6 +82,12 @@ namespace PubSubHubBubReciever.Controllers
             XmlSerializer serializer = new XmlSerializer(typeof(feed));
             using StringReader stringReader = new StringReader(bodyString);
             feed xml = (feed)serializer.Deserialize(stringReader);
+
+            if (xml.link is null)
+            {
+                Console.WriteLine("Incoming HTTP-POST with improper xml body! Ignoring.");
+                return StatusCode(418);
+            }
 
             using WebClient webClient = new WebClient();
             var pubText = Environment.GetEnvironmentVariable(EnvVars.PUBLISH_TEXT.ToString());

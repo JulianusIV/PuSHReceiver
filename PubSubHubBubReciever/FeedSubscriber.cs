@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace PubSubHubBubReciever
 {
     public class FeedSubscriber
     {
         public static bool IsSubscribed = false;
+
+        public static Timer LeaseTimer = new Timer();
 
         public static async Task<bool> SubscribeAsync(bool subscribe = true)
         {
@@ -45,11 +48,11 @@ namespace PubSubHubBubReciever
         public static void AwaitLease(int leaseTime)
         {
             Console.WriteLine($"Scheduling lease renewal in {leaseTime} seconds");
-            _ = Task.Run(async () =>
-            {
-                await Task.Delay(TimeSpan.FromSeconds(leaseTime));
-                await SubscribeAsync();
-            });
+            LeaseTimer.Stop();
+            LeaseTimer.Interval = leaseTime;
+            LeaseTimer.AutoReset = false;
+            LeaseTimer.Elapsed += async (sender, e) => await SubscribeAsync();
+            LeaseTimer.Start();
         }
     }
 }

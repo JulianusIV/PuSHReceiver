@@ -8,7 +8,6 @@ using PubSubHubBubReciever.Controllers;
 using System;
 using System.Collections.Specialized;
 using System.Net;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace PubSubHubBubReciever
@@ -61,7 +60,8 @@ namespace PubSubHubBubReciever
                     webClient.UploadValues(Environment.GetEnvironmentVariable("WEBHOOK_URL"), new NameValueCollection
                     {
                         { "username", Environment.GetEnvironmentVariable(EnvVars.USERNAME.ToString()) },
-                        { "content", "Subscribe did not return 204/No Content!\nExiting!" }
+                        { "content", "<@!387325006176059394> Subscribe did not return 204/No Content!\nExiting!" },
+                        { "avatar_url", Environment.GetEnvironmentVariable(EnvVars.HOOK_PFP.ToString()) }
                     });
                     Environment.Exit(0);
                 }
@@ -74,7 +74,7 @@ namespace PubSubHubBubReciever
             {
                 FeedSubscriber.SubscribeAsync(false).GetAwaiter().GetResult();
 
-                Console.WriteLine("Getting cancellation Token and waiting for Cancellation or 3 min.");
+                Console.WriteLine("Getting cancellation Token and waiting for cancellation or 3 min.");
                 var cancellationToken = FeedRecieverController.tokenSource.Token;
                 cancellationToken.WaitHandle.WaitOne(TimeSpan.FromSeconds(180));
                 Console.WriteLine(cancellationToken.IsCancellationRequested ?

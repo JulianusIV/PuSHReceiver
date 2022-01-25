@@ -49,7 +49,7 @@ namespace PubSubHubBubReciever
         {
             Console.WriteLine($"Scheduling lease renewal in {leaseTime} seconds");
             LeaseTimer.Stop();
-            LeaseTimer.Interval = leaseTime;
+            LeaseTimer.Interval = TimeSpan.FromSeconds(leaseTime).TotalMilliseconds;
             LeaseTimer.AutoReset = false;
             LeaseTimer.Elapsed += async (sender, e) => await SubscribeAsync();
             LeaseTimer.Start();

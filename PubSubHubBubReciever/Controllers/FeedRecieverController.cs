@@ -1,12 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Specialized;
 using System.IO;
-using System.Net;
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Xml.Serialization;
 
@@ -89,15 +86,7 @@ namespace PubSubHubBubReciever.Controllers
                 return StatusCode(418);
             }
 
-            using WebClient webClient = new WebClient();
-            var pubText = Environment.GetEnvironmentVariable(EnvVars.PUBLISH_TEXT.ToString());
-            pubText = Regex.Unescape(pubText);
-            webClient.UploadValues(Environment.GetEnvironmentVariable(EnvVars.WEBHOOK_URL.ToString()), new NameValueCollection
-            {
-                { "username", Environment.GetEnvironmentVariable(EnvVars.USERNAME.ToString()) },
-                { "content", pubText + xml.entry.link.href },
-                { "avatar_url", Environment.GetEnvironmentVariable(EnvVars.HOOK_PFP.ToString()) }
-            });
+            Publisher.PublishToDiscord(xml.entry.link.href);
 
             return new OkResult();
         }

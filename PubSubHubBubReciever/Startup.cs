@@ -54,33 +54,22 @@ namespace PubSubHubBubReciever
         {
             _ = Task.Run(() =>
             {
-                if (!FeedSubscriber.SubscribeAsync().GetAwaiter().GetResult())
-                {
-                    using WebClient webClient = new WebClient();
-                    webClient.UploadValues(Environment.GetEnvironmentVariable("WEBHOOK_URL"), new NameValueCollection
-                    {
-                        { "username", Environment.GetEnvironmentVariable(EnvVars.USERNAME.ToString()) },
-                        { "content", "<@!387325006176059394> Subscribe did not return 204/No Content!\nExiting!" },
-                        { "avatar_url", Environment.GetEnvironmentVariable(EnvVars.HOOK_PFP.ToString()) }
-                    });
-                    Environment.Exit(0);
-                }
+#if !DEBUG
+                SubscriptionHandler.SubscribeAll();
+#endif
             });
         }
 
         private void OnAppStopping()
         {
-            if (FeedSubscriber.IsSubscribed)
-            {
-                FeedSubscriber.SubscribeAsync(false).GetAwaiter().GetResult();
+            SubscriptionHandler.UnsubscribeAll();
 
-                Console.WriteLine("Getting cancellation Token and waiting for cancellation or 3 min.");
-                var cancellationToken = FeedRecieverController.tokenSource.Token;
-                cancellationToken.WaitHandle.WaitOne(TimeSpan.FromSeconds(180));
-                Console.WriteLine(cancellationToken.IsCancellationRequested ?
-                    "Timeout cancelled, unsubscribe successful, continuing graceful shutdown." :
-                    "Timeout, shutting down w/o unsubscribe.");
-            }
+            Console.WriteLine("Getting cancellation Token and waiting for cancellation or 3 min.");
+            var cancellationToken = FeedRecieverController.tokenSource.Token;
+            cancellationToken.WaitHandle.WaitOne(TimeSpan.FromSeconds(180));
+            Console.WriteLine(cancellationToken.IsCancellationRequested ?
+                "Timeout cancelled, unsubscribe successful, continuing graceful shutdown." :
+                "Timeout, shutting down w/o or with partial unsubscribe.");
         }
     }
 }

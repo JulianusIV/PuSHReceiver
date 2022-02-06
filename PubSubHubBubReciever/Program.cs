@@ -13,12 +13,7 @@ namespace PubSubHubBubReciever
     {
         public static void Main(string[] args)
         {
-#if DEBUG
-            foreach (var line in File.ReadAllLines("settings.env"))
-            {
-                Environment.SetEnvironmentVariable(line[..line.IndexOf('=')], line[(line.IndexOf('=') + 1)..]);
-            }
-#endif
+            TopicRepository.Instance.Load();
             CreateHostBuilder(args).Build().Run();
         }
 

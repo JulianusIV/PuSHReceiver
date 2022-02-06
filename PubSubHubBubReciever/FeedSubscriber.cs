@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PubSubHubBubReciever.JSONObjects;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
@@ -9,11 +10,9 @@ namespace PubSubHubBubReciever
 {
     public class FeedSubscriber
     {
-        public static bool IsSubscribed = false;
+        public static Dictionary<long, Timer> LeaseTimers = new Dictionary<long, Timer>();
 
-        public static Timer LeaseTimer = new Timer();
-
-        public static async Task<bool> SubscribeAsync(bool subscribe = true)
+        public static async Task<bool> SubscribeAsync(DataSub topic, bool subscribe = true)
         {
             Console.WriteLine("Requesting new subscription");
             using var client = new HttpClient();
@@ -24,11 +23,11 @@ namespace PubSubHubBubReciever
             var formList = new List<KeyValuePair<string, string>>
             {
                 new KeyValuePair<string, string>("hub.mode", subscribe ? "subscribe" : "unsubscribe"),
-                new KeyValuePair<string, string>("hub.topic", Environment.GetEnvironmentVariable(EnvVars.TOPIC.ToString())),
-                new KeyValuePair<string, string>("hub.callback", Environment.GetEnvironmentVariable(EnvVars.CALLBACK_URL.ToString())),
+                new KeyValuePair<string, string>("hub.topic", topic.TopicURL),
+                new KeyValuePair<string, string>("hub.callback", SubscriptionHandler.GetTopicCallback(topic.TopicID)),
                 new KeyValuePair<string, string>("hub.verify", "sync"),
-                new KeyValuePair<string, string>("hub.secret", Environment.GetEnvironmentVariable(EnvVars.HUB_SECRET.ToString())),
-                new KeyValuePair<string, string>("hub.verify_token", Environment.GetEnvironmentVariable(EnvVars.HUB_TOKEN.ToString()))
+                new KeyValuePair<string, string>("hub.secret", topic.Secret),
+                new KeyValuePair<string, string>("hub.verify_token", topic.Token)
             };
             request.Content = new FormUrlEncodedContent(formList);
 
@@ -40,19 +39,20 @@ namespace PubSubHubBubReciever
                 Console.WriteLine(response.StatusCode + " - " + response.Content.ReadAsStringAsync().GetAwaiter().GetResult());
                 Console.ForegroundColor = ConsoleColor.Gray;
             }
-            else
-                IsSubscribed = true;
             return result;
         }
 
-        public static void AwaitLease(int leaseTime)
+        public static void AwaitLease(long topicId, int leaseTime)
         {
-            Console.WriteLine($"Scheduling lease renewal in {leaseTime} seconds");
-            LeaseTimer.Stop();
-            LeaseTimer.Interval = TimeSpan.FromSeconds(leaseTime).TotalMilliseconds;
-            LeaseTimer.AutoReset = false;
-            LeaseTimer.Elapsed += async (sender, e) => await SubscribeAsync();
-            LeaseTimer.Start();
+            Console.WriteLine($"Scheduling lease renewal for topic {topicId} in {leaseTime} seconds");
+            if (!LeaseTimers.ContainsKey(topicId))
+                LeaseTimers.Add(topicId, new Timer());
+
+            LeaseTimers[topicId].Stop();
+            LeaseTimers[topicId].Interval = TimeSpan.FromSeconds(leaseTime).TotalMilliseconds;
+            LeaseTimers[topicId].AutoReset = false;
+            LeaseTimers[topicId].Elapsed += async (sender, e) => await SubscribeAsync(SubscriptionHandler.GetTopic(topicId));
+            LeaseTimers[topicId].Start();
         }
     }
 }

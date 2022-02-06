@@ -268,3 +268,5 @@ app.config
 error.txt
 settings.env
 Bulklog.txt
+/PubSubHubBubReciever/leases.json
+/PubSubHubBubReciever/data.json

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PubSubHubBubReciever.JSONObjects;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Net;
 using System.Security.Cryptography;
@@ -9,28 +10,29 @@ namespace PubSubHubBubReciever
 {
     public class Publisher
     {
-        private static byte[] lastPublishHash;
+        private static readonly Dictionary<long, byte[]> lastPublishHashes = new Dictionary<long, byte[]>();
 
-        public static void PublishToDiscord(string link)
+        public static void PublishToDiscord(DataSub topic, string link)
         {
             using WebClient webClient = new WebClient();
-            var pubText = Environment.GetEnvironmentVariable(EnvVars.PUBLISH_TEXT.ToString());
-            pubText = Regex.Unescape(pubText);
+            var pubText = Regex.Unescape(topic.PubText);
 
             var hash = SHA1.Create().ComputeHash(Encoding.UTF8.GetBytes(pubText));
-            if (!(lastPublishHash is null))
+            if (lastPublishHashes.ContainsKey(topic.TopicID))
             {
-                if (hash == lastPublishHash)
+                if (hash == lastPublishHashes[topic.TopicID])
                     return;
+                else
+                    lastPublishHashes[topic.TopicID] = hash;
             }
+            else
+                lastPublishHashes.Add(topic.TopicID, hash);
 
-            lastPublishHash = hash;
-
-            webClient.UploadValues(Environment.GetEnvironmentVariable(EnvVars.WEBHOOK_URL.ToString()), new NameValueCollection
+            webClient.UploadValues(topic.WebhookURL, new NameValueCollection
             {
-                { "username", Environment.GetEnvironmentVariable(EnvVars.USERNAME.ToString()) },
+                { "username", topic.PubName },
                 { "content", pubText + " " + link },
-                { "avatar_url", Environment.GetEnvironmentVariable(EnvVars.HOOK_PFP.ToString()) }
+                { "avatar_url", topic.PubProfilePic }
             });
         }
     }

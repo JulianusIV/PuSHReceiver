@@ -1,0 +1,16 @@
+{
+	"AdminToken":"1234",
+	"CallbackURL":"https://mydomain.com/FeedSubscriber", 
+	"Subs":[
+		{
+			"TopicID":0,
+			"TopicURL":"https://www.youtube.com/xml/feeds/videos.xml?channel_id=my_channel_id",
+			"Token":"my_token",
+			"Secret":"my_secret",
+			"WebhookURL":"https://discord.com/api/webhooks/webhook_id/webhook_token",
+			"PubText":"@everyone new video, watch here:\n",
+			"PubProfilePic":"https://cdn.discordapp.com/attachments/784535910175735838/935557046747676732/unknown.png",
+			"PubName":"YoutubeHook"
+		}
+	]
+}

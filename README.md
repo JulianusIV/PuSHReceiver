@@ -1,3 +1,6 @@
+[![CodeQL](https://github.com/JulianusIV/PubSubHubBubReciever/actions/workflows/codeql-analysis.yml/badge.svg?branch=master)](https://github.com/JulianusIV/PubSubHubBubReciever/actions/workflows/codeql-analysis.yml)
+[![Docker Image CI](https://github.com/JulianusIV/PubSubHubBubReciever/actions/workflows/docker-ci.yml/badge.svg?branch=master)](https://github.com/JulianusIV/PubSubHubBubReciever/actions/workflows/docker-ci.yml)
+
 # PubSubHubBubReciever
 
 **An ASP.NET Core API to forward PuSH notifications from Google's [PubSubHubBub](https://pubsubhubbub.appspot.com) to a [Discord webhook](https://discord.com/developers/docs/resources/webhook#execute-webhook).**

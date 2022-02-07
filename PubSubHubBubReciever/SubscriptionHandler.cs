@@ -83,10 +83,15 @@ namespace PubSubHubBubReciever
             TopicRepository.Instance.Leases.Subs.Add(leaseSub);
 
             if (await FeedSubscriber.SubscribeAsync(dataSub))
+            {
+                TopicRepository.Instance.Save(FileNames.data);
+                TopicRepository.Instance.Save(FileNames.leases);
                 return true;
+            }
 
             TopicRepository.Instance.Data.Subs.Remove(dataSub);
             TopicRepository.Instance.Leases.Subs.Remove(leaseSub);
+
             return false;
         }
 
@@ -98,6 +103,10 @@ namespace PubSubHubBubReciever
 
             TopicRepository.Instance.Data.Subs.Remove(topic);
             TopicRepository.Instance.Leases.Subs.Remove(TopicRepository.Instance.Leases.Subs.Single(x => x.TopicID == topicId));
+
+            TopicRepository.Instance.Save(FileNames.data);
+            TopicRepository.Instance.Save(FileNames.leases);
+
             return true;
         }
 
@@ -115,7 +124,11 @@ namespace PubSubHubBubReciever
             TopicRepository.Instance.Leases.Subs[leaseIndex] = leaseSub;
 
             if (await FeedSubscriber.SubscribeAsync(dataSub))
+            {
+                TopicRepository.Instance.Save(FileNames.data);
+                TopicRepository.Instance.Save(FileNames.leases);
                 return true;
+            }
 
             TopicRepository.Instance.Data.Subs[dataIndex] = dataSub;
             TopicRepository.Instance.Leases.Subs[leaseIndex] = oldLease;

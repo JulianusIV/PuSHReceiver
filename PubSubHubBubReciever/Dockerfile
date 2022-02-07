@@ -1,6 +1,8 @@
 FROM mcr.microsoft.com/dotnet/aspnet:3.1 AS base
 WORKDIR /app
 EXPOSE 80
+COPY ["data.json.template", "./data.json"]
+COPY ["leases.json.template", "./leases.json"]
 
 FROM mcr.microsoft.com/dotnet/sdk:3.1 AS build
 WORKDIR /src

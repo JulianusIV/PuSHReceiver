@@ -31,7 +31,7 @@ namespace PubSubHubBubReciever
             {
                 var lease = TopicRepository.Instance.Leases.Subs.Single(y => y.TopicID == x.TopicID);
                 var leaseExpiration = lease.LastLease + TimeSpan.FromSeconds(lease.LeaseTime);
-                return leaseExpiration < DateTime.Now;
+                return leaseExpiration < DateTime.Now || !lease.Subscribed;
             });
 
             foreach (var item in toSubscribe)
@@ -39,7 +39,7 @@ namespace PubSubHubBubReciever
                 await FeedSubscriber.SubscribeAsync(item);
             }
 
-            foreach (var item in TopicRepository.Instance.Leases.Subs.Where(x => x.LastLease + TimeSpan.FromSeconds(x.LeaseTime) > DateTime.Now))
+            foreach (var item in TopicRepository.Instance.Leases.Subs.Where(x => x.LastLease + TimeSpan.FromSeconds(x.LeaseTime) > DateTime.Now && x.Subscribed))
             {
                 FeedSubscriber.AwaitLease(item.TopicID, (int)(item.LastLease + TimeSpan.FromSeconds(item.LeaseTime) - DateTime.Now).TotalSeconds);
             }

@@ -59,7 +59,7 @@ namespace PubSubHubBubReciever
                 {
                     Leases = new Leases()
                     {
-                        Subs = new LeaseSub[] { new LeaseSub() }
+                        Subs = new List<LeaseSub> { new LeaseSub() }
                     };
                     File.WriteAllText("leases.json", JsonSerializer.Serialize(Leases));
                     Console.WriteLine("Created file leases.json, please fill in proper values.");

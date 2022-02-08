@@ -52,16 +52,13 @@ namespace PubSubHubBubReciever
 
         private void OnAppStarted()
         {
-            _ = Task.Run(() =>
-            {
 #if !DEBUG
-                if (!_subscribed)
-                {
-                    SubscriptionHandler.SubscribeAll();
-                    _subscribed = true;
-                }
+            if (!_subscribed)
+            {
+                _subscribed = true;
+                SubscriptionHandler.SubscribeAll();
+            }
 #endif
-            });
         }
 
         private void OnAppStopping()

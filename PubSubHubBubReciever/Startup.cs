@@ -12,8 +12,6 @@ namespace PubSubHubBubReciever
 {
     public class Startup
     {
-        private static bool _subscribed = false;
-
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -52,11 +50,9 @@ namespace PubSubHubBubReciever
 
         private void OnAppStarted()
         {
-            if (!_subscribed)
-            {
-                _subscribed = true;
-                SubscriptionHandler.SubscribeAll();
-            }
+#if !DEBUG
+            SubscriptionHandler.SubscribeAll(); 
+#endif
         }
 
         private void OnAppStopping()

@@ -32,19 +32,13 @@ namespace PubSubHubBubReciever
                 var lease = TopicRepository.Instance.Leases.Subs.Single(y => y.TopicID == x.TopicID);
                 var leaseExpiration = lease.LastLease + TimeSpan.FromSeconds(lease.LeaseTime);
                 return leaseExpiration < DateTime.Now || !lease.Subscribed;
-            });
+            }).ToList();
 
             foreach (var item in toSubscribe)
-            {
                 await FeedSubscriber.SubscribeAsync(item);
-            }
 
-            foreach (var item in TopicRepository.Instance.Leases.Subs)
-            {
-                if (toSubscribe.Any(x => x.TopicID == item.TopicID))
-                    continue;
+            foreach (var item in TopicRepository.Instance.Leases.Subs.Where(x => !toSubscribe.Any(y => y.TopicID == x.TopicID)))
                 FeedSubscriber.AwaitLease(item.TopicID, (int)(item.LastLease + TimeSpan.FromSeconds(item.LeaseTime) - DateTime.Now).TotalSeconds);
-            }
         }
 
         public async static void UnsubscribeAll()

@@ -1,6 +1,6 @@
 {
-	"AdminToken":"1234",
-	"CallbackURL":"https://mydomain.com/FeedSubscriber", 
+	"AdminToken":"ExampleToken",
+	"CallbackURL":"https://mydomain.example.com/FeedSubscriber", 
 	"Subs":[
 		{
 			"TopicID":0,

@@ -22,6 +22,15 @@ namespace PubSubHubBubReciever.Controllers
             if (!SubscriptionHandler.VerifyAdminToken(adminToken))
                 return StatusCode(401);
 
+            if (string.IsNullOrWhiteSpace(topicUrl))
+                return StatusCode(400);
+
+            if (string.IsNullOrWhiteSpace(webhookUrl))
+                return StatusCode(400);
+
+            if (string.IsNullOrWhiteSpace(topicUrl))
+                return StatusCode(400);
+
             Random random = new Random();
 
             var id = long.Parse(random.Next(10000, 100000).ToString() + DateTimeOffset.Now.ToUnixTimeSeconds().ToString());
@@ -41,9 +50,9 @@ namespace PubSubHubBubReciever.Controllers
                 TopicURL = topicUrl,
                 Token = token,
                 Secret = secret,
-                PubText = pubText,
-                PubProfilePic = pubPfp,
-                PubName = pubName,
+                PubText = pubText ?? "@everyone new Upload" + Environment.NewLine,
+                PubProfilePic = pubPfp ?? "https://cdn.discordapp.com/attachments/784535910175735838/935557046747676732/unknown.png",
+                PubName = pubName ?? "PuSH",
                 WebhookURL = webhookUrl
             };
 
@@ -97,13 +106,13 @@ namespace PubSubHubBubReciever.Controllers
             DataSub topic = new DataSub()
             {
                 TopicID = topicId,
-                TopicURL = topicUrl,
+                TopicURL = topicUrl ?? oldTopic.TopicURL,
                 Token = oldTopic.Token,
                 Secret = oldTopic.Secret,
-                PubText = pubText,
-                PubProfilePic = pubPfp,
-                PubName = pubName,
-                WebhookURL = webhookUrl
+                PubText = pubText ?? oldTopic.PubText,
+                PubProfilePic = pubPfp ?? oldTopic.PubProfilePic,
+                PubName = pubName ?? oldTopic.PubName,
+                WebhookURL = webhookUrl ?? oldTopic.WebhookURL
             };
 
             LeaseSub lease = new LeaseSub()

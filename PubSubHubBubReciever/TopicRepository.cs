@@ -61,7 +61,7 @@ namespace PubSubHubBubReciever
                     {
                         Subs = new List<LeaseSub> { new LeaseSub() }
                     };
-                    File.WriteAllText("leases.json", JsonSerializer.Serialize(Leases));
+                    File.WriteAllText("leases.json", JsonSerializer.Serialize(Leases, new JsonSerializerOptions() { WriteIndented = true }));
                     Console.WriteLine("Created file leases.json, please fill in proper values.");
                     Environment.Exit(0);
                 }
@@ -78,7 +78,7 @@ namespace PubSubHubBubReciever
                 else
                     data = Leases;
 
-                File.WriteAllText(fileName.ToString() + ".json", JsonSerializer.Serialize(data));
+                File.WriteAllText(fileName.ToString() + ".json", JsonSerializer.Serialize(data, new JsonSerializerOptions() { WriteIndented = true }));
             }
         }
     }

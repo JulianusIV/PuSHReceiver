@@ -26,14 +26,14 @@ namespace PubSubHubBubReciever.Controllers
 
             var id = long.Parse(random.Next(10000, 100000).ToString() + DateTimeOffset.Now.ToUnixTimeSeconds().ToString());
             var idBytes = BitConverter.GetBytes(id);
-            var token = Encoding.UTF8.GetString(SHA256.Create().ComputeHash(idBytes));
+            var token = BitConverter.ToString(SHA256.Create().ComputeHash(idBytes)).Replace("-", "").ToLower();
 
             var tokenBytes = Encoding.UTF8.GetBytes(token);
 
             var secretBytes = idBytes.ToList();
             secretBytes.AddRange(tokenBytes);
 
-            var secret = Encoding.UTF8.GetString(SHA256.Create().ComputeHash(secretBytes.ToArray()));
+            var secret = BitConverter.ToString(SHA256.Create().ComputeHash(secretBytes.ToArray())).Replace("-", "").ToLower();
 
             DataSub topic = new DataSub()
             {

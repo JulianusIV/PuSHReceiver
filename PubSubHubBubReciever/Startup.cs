@@ -6,14 +6,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PubSubHubBubReciever.Controllers;
 using System;
-using System.Collections.Specialized;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace PubSubHubBubReciever
 {
     public class Startup
     {
+        private static bool _subscribed = false;
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -55,7 +55,11 @@ namespace PubSubHubBubReciever
             _ = Task.Run(() =>
             {
 #if !DEBUG
-                SubscriptionHandler.SubscribeAll();
+                if (!_subscribed)
+                {
+                    SubscriptionHandler.SubscribeAll();
+                    _subscribed = true;
+                }
 #endif
             });
         }

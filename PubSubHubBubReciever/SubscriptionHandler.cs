@@ -25,7 +25,7 @@ namespace PubSubHubBubReciever
             TopicRepository.Instance.Save(FileNames.leases);
         }
 
-        public async static void SubscribeAll()
+        public static async void SubscribeAll()
         {
             var toSubscribe = TopicRepository.Instance.Data.Subs.Where(x =>
             {
@@ -41,7 +41,7 @@ namespace PubSubHubBubReciever
                 FeedSubscriber.AwaitLease(item.TopicID, (int)(item.LastLease + TimeSpan.FromSeconds(item.LeaseTime) - DateTime.Now).TotalSeconds);
         }
 
-        public async static void UnsubscribeAll()
+        public static async void UnsubscribeAll()
         {
             var toUnsubscribe = TopicRepository.Instance.Data.Subs.Where(x =>
             {
@@ -73,7 +73,7 @@ namespace PubSubHubBubReciever
         public static bool VerifyAdminToken(string token)
             => TopicRepository.Instance.Data.AdminToken == token;
 
-        public async static Task<bool> AddTopic(DataSub dataSub, LeaseSub leaseSub)
+        public static async Task<bool> AddTopic(DataSub dataSub, LeaseSub leaseSub)
         {
             TopicRepository.Instance.Data.Subs.Add(dataSub);
             TopicRepository.Instance.Leases.Subs.Add(leaseSub);
@@ -91,7 +91,7 @@ namespace PubSubHubBubReciever
             return false;
         }
 
-        public async static Task<bool> RemoveTopic(long topicId)
+        public static async Task<bool> RemoveTopic(long topicId)
         {
             var topic = TopicRepository.Instance.Data.Subs.Single(x => x.TopicID == topicId);
             if (!await FeedSubscriber.SubscribeAsync(topic, false))
@@ -106,7 +106,7 @@ namespace PubSubHubBubReciever
             return true;
         }
 
-        public async static Task<bool> UpdateTopic(DataSub dataSub, LeaseSub leaseSub)
+        public static async Task<bool> UpdateTopic(DataSub dataSub, LeaseSub leaseSub)
         {
             var oldTopic = TopicRepository.Instance.Data.Subs.Single(x => x.TopicID == dataSub.TopicID);
             if (!await FeedSubscriber.SubscribeAsync(oldTopic, false))

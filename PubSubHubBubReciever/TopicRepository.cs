@@ -25,7 +25,7 @@ namespace PubSubHubBubReciever
         }
 
         #endregion
-        
+
         private readonly object _instanceLock = new object();
 
         public Data Data { get; private set; }

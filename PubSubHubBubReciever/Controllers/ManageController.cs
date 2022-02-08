@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using PubSubHubBubReciever.JSONObjects;
 using System;
 using System.Linq;
@@ -31,7 +30,7 @@ namespace PubSubHubBubReciever.Controllers
 
             var tokenBytes = Encoding.UTF8.GetBytes(token);
 
-            var secretBytes = idBytes.ToList(); 
+            var secretBytes = idBytes.ToList();
             secretBytes.AddRange(tokenBytes);
 
             var secret = Encoding.UTF8.GetString(SHA256.Create().ComputeHash(secretBytes.ToArray()));

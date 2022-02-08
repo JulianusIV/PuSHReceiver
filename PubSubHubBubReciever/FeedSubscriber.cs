@@ -44,7 +44,7 @@ namespace PubSubHubBubReciever
 
         public static void AwaitLease(long topicId, int leaseTime)
         {
-            Console.WriteLine($"Scheduling lease renewal for topic {topicId} in {leaseTime} seconds");
+            Console.WriteLine($"Scheduling lease renewal for topic {topicId} in {leaseTime} seconds ({TimeSpan.FromSeconds(leaseTime).TotalDays} days)");
             if (!LeaseTimers.ContainsKey(topicId))
                 LeaseTimers.Add(topicId, new Timer());
 

@@ -6,7 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PubSubHubBubReciever.Controllers;
 using System;
-using System.Threading.Tasks;
 
 namespace PubSubHubBubReciever
 {

@@ -39,7 +39,7 @@ namespace PubSubHubBubReciever.Controllers
             if (mode == "subscribe")
             {
                 SubscriptionHandler.UpdateLeaseFile(topicId, true, lease);
-                
+
                 FeedSubscriber.AwaitLease(topicId, lease);
 
                 var result = Content(challenge);
@@ -60,7 +60,7 @@ namespace PubSubHubBubReciever.Controllers
                     Console.WriteLine("No Feeds subscribed anymore, cancelling token!");
                     tokenSource.Cancel();
                 }
-                
+
                 return result;
             }
             return StatusCode(405);
@@ -71,6 +71,8 @@ namespace PubSubHubBubReciever.Controllers
         [Consumes("application/xml")]
         public IActionResult Post([FromRoute] long topicId)
         {
+            Console.WriteLine($"Incomping HTTP-POST for topic {topicId}");
+
             if (!SubscriptionHandler.TopicExists(topicId))
                 return StatusCode(404);
 

@@ -39,8 +39,10 @@ namespace PubSubHubBubReciever
                 await FeedSubscriber.SubscribeAsync(item);
             }
 
-            foreach (var item in TopicRepository.Instance.Leases.Subs.Where(x => !toSubscribe.Any(y => y.TopicID == x.TopicID)))
+            foreach (var item in TopicRepository.Instance.Leases.Subs)
             {
+                if (toSubscribe.Any(x => x.TopicID == item.TopicID))
+                    continue;
                 FeedSubscriber.AwaitLease(item.TopicID, (int)(item.LastLease + TimeSpan.FromSeconds(item.LeaseTime) - DateTime.Now).TotalSeconds);
             }
         }

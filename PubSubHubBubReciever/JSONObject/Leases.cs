@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace PubSubHubBubReciever.JSONObjects
+namespace PubSubHubBubReciever.JSONObject
 {
     public class Leases
     {
@@ -10,7 +10,7 @@ namespace PubSubHubBubReciever.JSONObjects
 
     public class LeaseSub
     {
-        public long TopicID { get; set; }
+        public Guid TopicID { get; set; }
         public DateTime LastLease { get; set; }
         public int LeaseTime { get; set; }
         public bool Subscribed { get; set; }

@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PubSubHubBubReciever.JSONObjects;
+using PubSubHubBubReciever.DataService.Interface;
+using PubSubHubBubReciever.JSONObject;
+using PubSubHubBubReciever.Service.Interface;
 using System;
 using System.Linq;
 using System.Security.Cryptography;
@@ -9,17 +11,27 @@ namespace PubSubHubBubReciever.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public class ManageController : ControllerBase
+    internal class ManageController : ControllerBase
     {
+        private readonly ITopicDataService dataService;
+        private readonly ISubscriptionService subscriptionService;
+        internal ManageController(ITopicDataService dataService, ISubscriptionService subscriptionService)
+        {
+            this.dataService = dataService;
+            this.subscriptionService = subscriptionService;
+        }
+
         [HttpPost]
-        public IActionResult Post([FromQuery(Name = "adminToken")] string adminToken,
+        internal IActionResult Post([FromQuery(Name = "adminToken")] string adminToken,
             [FromQuery(Name = "topicUrl")] string topicUrl,
             [FromQuery(Name = "webhookUrl")] string webhookUrl,
             [FromQuery(Name = "pubText")] string pubText,
             [FromQuery(Name = "pubPfp")] string pubPfp,
-            [FromQuery(Name = "pubName")] string pubName)
+            [FromQuery(Name = "pubName")] string pubName,
+            [FromQuery(Name = "Parser")] string parser,
+            [FromQuery(Name = "Publisher")] string publisher)
         {
-            if (!SubscriptionHandler.VerifyAdminToken(adminToken))
+            if (!dataService.VerifyAdminToken(adminToken))
                 return StatusCode(401);
 
             if (string.IsNullOrWhiteSpace(topicUrl))
@@ -31,10 +43,8 @@ namespace PubSubHubBubReciever.Controllers
             if (string.IsNullOrWhiteSpace(topicUrl))
                 return StatusCode(400);
 
-            Random random = new Random();
-
-            var id = long.Parse(random.Next(10000, 100000).ToString() + DateTimeOffset.Now.ToUnixTimeSeconds().ToString());
-            var idBytes = BitConverter.GetBytes(id);
+            var id = new Guid();
+            var idBytes = id.ToByteArray();
             var token = BitConverter.ToString(SHA256.Create().ComputeHash(idBytes)).Replace("-", "").ToLower();
 
             var tokenBytes = Encoding.UTF8.GetBytes(token);
@@ -53,7 +63,9 @@ namespace PubSubHubBubReciever.Controllers
                 PubText = pubText ?? "@everyone new Upload" + Environment.NewLine,
                 PubProfilePic = pubPfp ?? "https://cdn.discordapp.com/attachments/784535910175735838/935557046747676732/unknown.png",
                 PubName = pubName ?? "PuSH",
-                WebhookURL = webhookUrl
+                WebhookURL = webhookUrl,
+                FeedParser = parser ?? "YouTubeXmlParser",
+                FeedPublisher = publisher ?? "DiscordWebhookPublisher"
             };
 
             LeaseSub lease = new LeaseSub()
@@ -64,55 +76,69 @@ namespace PubSubHubBubReciever.Controllers
                 Subscribed = false
             };
 
-            if (!SubscriptionHandler.AddTopic(topic, lease).GetAwaiter().GetResult())
+            if (!dataService.AddTopic(topic, lease))
                 return StatusCode(500);
+
+            if (!subscriptionService.SubscribeAsync(topic).GetAwaiter().GetResult())
+            {
+                dataService.DeleteTopic(topic, lease);
+                return StatusCode(500);
+            }
 
             return Ok(id.ToString() + Environment.NewLine + token + Environment.NewLine + secret);
         }
 
         [HttpDelete]
-        public IActionResult Delete([FromQuery(Name = "adminToken")] string adminToken,
-            [FromQuery(Name = "topicId")] long topicId)
+        internal IActionResult Delete([FromQuery(Name = "adminToken")] string adminToken,
+            [FromQuery(Name = "topicId")] Guid topicId)
         {
-            if (!SubscriptionHandler.VerifyAdminToken(adminToken))
+            if (!dataService.VerifyAdminToken(adminToken))
                 return StatusCode(401);
 
-            if (!SubscriptionHandler.TopicExists(topicId))
+            if (!(dataService.GetLeaseSub(topicId) is LeaseSub leaseSub))
                 return StatusCode(404);
+            var dataSub = dataService.GetDataSub(topicId);
 
-            if (!SubscriptionHandler.RemoveTopic(topicId).GetAwaiter().GetResult())
+            if (leaseSub.Subscribed)
+                if (!subscriptionService.SubscribeAsync(dataSub, false).GetAwaiter().GetResult())
+                    return StatusCode(500);
+
+            if (!dataService.DeleteTopic(dataSub, leaseSub))
                 return StatusCode(500);
 
             return Ok();
         }
 
         [HttpPatch]
-        public IActionResult Patch([FromQuery(Name = "adminToken")] string adminToken,
-            [FromQuery(Name = "topicId")] long topicId,
+        internal IActionResult Patch([FromQuery(Name = "adminToken")] string adminToken,
+            [FromQuery(Name = "topicId")] Guid topicId,
             [FromQuery(Name = "topicUrl")] string topicUrl,
             [FromQuery(Name = "webhookUrl")] string webhookUrl,
             [FromQuery(Name = "pubText")] string pubText,
             [FromQuery(Name = "pubPfp")] string pubPfp,
-            [FromQuery(Name = "pubName")] string pubName)
+            [FromQuery(Name = "pubName")] string pubName,
+            [FromQuery(Name = "Parser")] string parser,
+            [FromQuery(Name = "Publisher")] string publisher)
         {
-            if (!SubscriptionHandler.VerifyAdminToken(adminToken))
+            if (!dataService.VerifyAdminToken(adminToken))
                 return StatusCode(401);
 
-            if (!SubscriptionHandler.TopicExists(topicId))
+            if (!(dataService.GetLeaseSub(topicId) is LeaseSub leaseSub))
                 return StatusCode(404);
-
-            var oldTopic = SubscriptionHandler.GetTopic(topicId);
+            var dataSub = dataService.GetDataSub(topicId);
 
             DataSub topic = new DataSub()
             {
                 TopicID = topicId,
-                TopicURL = topicUrl ?? oldTopic.TopicURL,
-                Token = oldTopic.Token,
-                Secret = oldTopic.Secret,
-                PubText = pubText ?? oldTopic.PubText,
-                PubProfilePic = pubPfp ?? oldTopic.PubProfilePic,
-                PubName = pubName ?? oldTopic.PubName,
-                WebhookURL = webhookUrl ?? oldTopic.WebhookURL
+                TopicURL = topicUrl ?? dataSub.TopicURL,
+                Token = dataSub.Token,
+                Secret = dataSub.Secret,
+                PubText = pubText ?? dataSub.PubText,
+                PubProfilePic = pubPfp ?? dataSub.PubProfilePic,
+                PubName = pubName ?? dataSub.PubName,
+                WebhookURL = webhookUrl ?? dataSub.WebhookURL,
+                FeedParser = parser ?? dataSub.FeedParser,
+                FeedPublisher = publisher ?? dataSub.FeedPublisher
             };
 
             LeaseSub lease = new LeaseSub()
@@ -123,8 +149,21 @@ namespace PubSubHubBubReciever.Controllers
                 Subscribed = false
             };
 
-            if (!SubscriptionHandler.UpdateTopic(topic, lease).GetAwaiter().GetResult())
+            if (leaseSub.Subscribed)
+                if (!subscriptionService.SubscribeAsync(dataSub, false).GetAwaiter().GetResult())
+                    return StatusCode(500);
+
+            if (!dataService.UpdateTopic(topic, lease))
                 return StatusCode(500);
+
+            if (leaseSub.Subscribed)
+            {
+                if (!subscriptionService.SubscribeAsync(topic).GetAwaiter().GetResult())
+                {
+                    dataService.UpdateTopic(dataSub, leaseSub);
+                    return StatusCode(500);
+                }
+            }
 
             return Ok();
         }

@@ -1,40 +1,23 @@
-﻿using PubSubHubBubReciever.JSONObjects;
+﻿using PubSubHubBubReciever.JSONObject;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 
-namespace PubSubHubBubReciever
+namespace PubSubHubBubReciever.Repository
 {
-    public class TopicRepository
+    internal static class TopicRepository
     {
-        #region Singleton
-        private static readonly object padlock = new object();
-        private static TopicRepository _instance;
-        public static TopicRepository Instance
+        private static readonly object _lock = new object();
+
+        internal static Data Data { get; set; }
+        internal static Leases Leases { get; set; }
+
+        internal static void Load()
         {
-            get
+            lock (_lock)
             {
-                lock (padlock)
-                {
-                    if (_instance is null)
-                        _instance = new TopicRepository();
-                    return _instance;
-                }
-            }
-        }
-
-        #endregion
-
-        private readonly object _instanceLock = new object();
-
-        public Data Data { get; private set; }
-        public Leases Leases { get; private set; }
-
-        public void Load()
-        {
-            lock (_instanceLock)
-            {
+                bool exit = false;
                 if (File.Exists("data.json"))
                 {
                     string dataJson = File.ReadAllText("data.json");
@@ -48,7 +31,7 @@ namespace PubSubHubBubReciever
                     };
                     File.WriteAllText("data.json", JsonSerializer.Serialize(Data));
                     Console.WriteLine("Created file data.json, please fill in proper values.");
-                    Environment.Exit(0);
+                    exit = true;
                 }
                 if (File.Exists("leases.json"))
                 {
@@ -63,14 +46,16 @@ namespace PubSubHubBubReciever
                     };
                     File.WriteAllText("leases.json", JsonSerializer.Serialize(Leases, new JsonSerializerOptions() { WriteIndented = true }));
                     Console.WriteLine("Created file leases.json, please fill in proper values.");
-                    Environment.Exit(0);
+                    exit = true;
                 }
+                if (exit)
+                    Environment.Exit(0);
             }
         }
 
-        public void Save(FileNames fileName)
+        internal static void Save(FileNames fileName)
         {
-            lock (_instanceLock)
+            lock (_lock)
             {
                 object data;
                 if (fileName == FileNames.data)
@@ -83,7 +68,7 @@ namespace PubSubHubBubReciever
         }
     }
 
-    public enum FileNames
+    internal enum FileNames
     {
         data,
         leases

@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using Plugin;
+using PubSubHubBubReciever.Repository;
 
 namespace PubSubHubBubReciever
 {
@@ -7,7 +9,8 @@ namespace PubSubHubBubReciever
     {
         public static void Main(string[] args)
         {
-            TopicRepository.Instance.Load();
+            TopicRepository.Load();
+            PluginManager.Instance.Load();
             CreateHostBuilder(args).Build().Run();
         }
 

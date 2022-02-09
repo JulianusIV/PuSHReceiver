@@ -1,24 +1,33 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Plugin;
+using PubSubHubBubReciever.DataService.Interface;
+using PubSubHubBubReciever.JSONObject;
+using PubSubHubBubReciever.Service;
 using System;
 using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
-using System.Xml.Serialization;
 
 namespace PubSubHubBubReciever.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class FeedRecieverController : ControllerBase
+    internal class FeedRecieverController : ControllerBase
     {
         public static CancellationTokenSource tokenSource = new CancellationTokenSource();
 
+        private readonly ITopicDataService dataService;
+
+        internal FeedRecieverController(ITopicDataService dataService)
+        {
+            this.dataService = dataService;
+        }
+
         [HttpGet]
         [Route("{topicId}")]
-        public IActionResult Get([FromRoute] long topicId,
+        internal IActionResult Get([FromRoute] Guid topicId,
             [FromQuery(Name = "hub.topic")] string hubTopic,
             [FromQuery(Name = "hub.challenge")] string challenge,
             [FromQuery(Name = "hub.mode")] string mode,
@@ -27,20 +36,20 @@ namespace PubSubHubBubReciever.Controllers
         {
             Console.WriteLine($"Recieved HTTP-GET for topic {topicId} with params:\ntopic = {hubTopic}\nchallenge = {challenge}\nmode = {mode}\nlease = {lease}s\ntoken = {token}");
 
-            if (!SubscriptionHandler.TopicExists(topicId))
+            if (!(dataService.GetDataSub(topicId) is DataSub dataSub))
                 return StatusCode(404);
 
-            if (!SubscriptionHandler.VerifyToken(topicId, token))
+            if (token == dataSub.Token)
                 return StatusCode(498);
 
-            if (!SubscriptionHandler.VerifyTopicURL(topicId, hubTopic))
+            if (hubTopic == dataSub.TopicURL)
                 return StatusCode(404);
 
             if (mode == "subscribe")
             {
-                SubscriptionHandler.UpdateLeaseFile(topicId, true, lease);
+                dataService.UpdateLease(topicId, true, lease);
 
-                FeedSubscriber.AwaitLease(topicId, lease);
+                LeaseService.Instance.RegisterLease(dataSub, lease);
 
                 var result = Content(challenge);
                 result.StatusCode = 200;
@@ -48,14 +57,14 @@ namespace PubSubHubBubReciever.Controllers
             }
             else if (mode == "unsubscribe")
             {
-                SubscriptionHandler.UpdateLeaseFile(topicId, false);
+                dataService.UpdateLease(topicId, false);
 
                 Console.WriteLine("Recieved unsubscribe request, sending back challenge.");
 
                 var result = Content(challenge);
                 result.StatusCode = 200;
 
-                if (SubscriptionHandler.CountSubs() == 0)
+                if (dataService.CountSubbedTopics() == 0)
                 {
                     Console.WriteLine("No Feeds subscribed anymore, cancelling token!");
                     tokenSource.Cancel();
@@ -69,14 +78,15 @@ namespace PubSubHubBubReciever.Controllers
         [HttpPost]
         [Route("{topicId}")]
         [Consumes("application/xml")]
-        public IActionResult Post([FromRoute] long topicId)
+        internal IActionResult Post([FromRoute] Guid topicId)
         {
             Console.WriteLine($"Incomping HTTP-POST for topic {topicId}");
 
-            if (!SubscriptionHandler.TopicExists(topicId))
+            if (!(dataService.GetLeaseSub(topicId) is LeaseSub leaseSub))
                 return StatusCode(404);
+            var dataSub = dataService.GetDataSub(topicId);
 
-            if (!SubscriptionHandler.IsSubscribed(topicId))
+            if (!leaseSub.Subscribed)
                 return StatusCode(412);
 
             var headerHash = HttpContext.Request.Headers["X-Hub-Signature"].ToString().Replace("sha1=", "");
@@ -86,7 +96,7 @@ namespace PubSubHubBubReciever.Controllers
             byte[] bytes = Encoding.UTF8.GetBytes(bodyString);
 
             var hmac = HMAC.Create("HMACSHA1");
-            string secret = SubscriptionHandler.GetSecret(topicId);
+            string secret = dataSub.Secret;
             hmac.Key = Encoding.UTF8.GetBytes(secret);
             var hash = hmac.ComputeHash(bytes);
             var hashString = BitConverter.ToString(hash).Replace("-", "").ToLower();
@@ -99,22 +109,29 @@ namespace PubSubHubBubReciever.Controllers
 
             Console.WriteLine("Recieved HTTP-POST with body:\n" + bodyString);
 
-            XmlSerializer serializer = new XmlSerializer(typeof(feed));
-            using StringReader stringReader = new StringReader(bodyString);
-            feed xml = (feed)serializer.Deserialize(stringReader);
+            var parser = PluginManager.Instance.ResolveParserPlugin(dataSub.FeedParser);
 
-            if (xml.link is null)
-            {
-                Console.WriteLine("Incoming HTTP-POST with improper xml body! Ignoring.");
-                return StatusCode(422);
-            }
+            var feedItem = parser.FeedUpdate(bodyString);
 
-            if (!SubscriptionHandler.VerifyTopicURL(topicId, xml.link.Single(x => x.rel == "self").href))
-                return StatusCode(404);
+            var publisher = PluginManager.Instance.ResolvePublishPlugin(dataSub.FeedPublisher);
 
-            Publisher.PublishToDiscord(SubscriptionHandler.GetTopic(topicId), xml.entry.link.href);
+            publisher.FeedUpdate(feedItem);
 
             return new OkResult();
+            //XmlSerializer serializer = new XmlSerializer(typeof(feed));
+            //using StringReader stringReader = new StringReader(bodyString);
+            //feed xml = (feed)serializer.Deserialize(stringReader);
+
+            //if (xml.link is null)
+            //{
+            //    Console.WriteLine("Incoming HTTP-POST with improper xml body! Ignoring.");
+            //    return StatusCode(422);
+            //}
+
+            //if (!SubscriptionHandler.VerifyTopicURL(topicId, xml.link.Single(x => x.rel == "self").href))
+            //    return StatusCode(404);
+
+            //Publisher.PublishToDiscord(SubscriptionHandler.GetTopic(topicId), xml.entry.link.href);
         }
     }
 }

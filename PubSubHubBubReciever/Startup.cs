@@ -5,29 +5,38 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PubSubHubBubReciever.Controllers;
+using PubSubHubBubReciever.DataService;
+using PubSubHubBubReciever.DataService.Interface;
+using PubSubHubBubReciever.Service;
+using PubSubHubBubReciever.Service.Interface;
 using System;
 
 namespace PubSubHubBubReciever
 {
-    public class Startup
+    internal class Startup
     {
-        public Startup(IConfiguration configuration)
+        internal Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            subscriptionService = new SubscriptionService(new TopicDataService());
         }
 
-        public IConfiguration Configuration { get; }
+        internal IConfiguration Configuration { get; }
+        private readonly ISubscriptionService subscriptionService;
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        internal void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<ITopicDataService, TopicDataService>();
+            services.AddSingleton<ISubscriptionService, SubscriptionService>();
+
             services.Configure<KestrelServerOptions>(options => options.AllowSynchronousIO = true);
 
             services.AddControllers().AddXmlSerializerFormatters();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHostApplicationLifetime lifetime)
+        internal void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHostApplicationLifetime lifetime)
         {
             if (env.IsDevelopment())
             {
@@ -49,14 +58,14 @@ namespace PubSubHubBubReciever
 
         private void OnAppStarted()
         {
-#if !DEBUG
-            SubscriptionHandler.SubscribeAll(); 
+#if DEBUG
+            subscriptionService.SubscribeAll();
 #endif
         }
 
         private void OnAppStopping()
         {
-            SubscriptionHandler.UnsubscribeAll();
+            subscriptionService.UnsubscribeAll();
 
             Console.WriteLine("Getting cancellation Token and waiting for cancellation or 3 min.");
             var cancellationToken = FeedRecieverController.tokenSource.Token;

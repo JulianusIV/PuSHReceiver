@@ -58,7 +58,7 @@ namespace PubSubHubBubReciever
 
         private void OnAppStarted()
         {
-#if DEBUG
+#if !DEBUG
             subscriptionService.SubscribeAll();
 #endif
         }

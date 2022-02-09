@@ -11,7 +11,7 @@ There are many Solutions to forward YouTube notifications to Webhooks, like [IFT
 
 ## How does it work?
 
-On Startup completion the program reads the topics from the ``data.json`` file, and subscribes to them at the hub, this triggers a HTTP-GET from to haub to the given callback url. The callback url is a base url, like ``https://my-reciever/FeedSubscriber`` with the TopicID appended to it ``https://my-reciever/FeedSubscriber/<topic_id>``
+On Startup completion the program reads the topics from the ``data.json`` file, and subscribes to them at the hub, this triggers a HTTP-GET from the hub to the given callback url. The callback url is a base url, like ``https://my-reciever/FeedSubscriber`` with the TopicID appended to it ``https://my-reciever/FeedSubscriber/<topic_id>``
 The API Processes this request and sends back the ``hub.challenge`` parameter, if the request was valid, which completes the subscribe action.
 On recieving a new subscribe a lease refresh is also scheduled using a timer with the lease time given in the ``hub.lease_seconds`` parameter of the previous GET method.
 Whenever that timer runs through the subscription flow is triggered again.

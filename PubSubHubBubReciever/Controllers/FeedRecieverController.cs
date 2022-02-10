@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using DataLayer.JSONObject;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Plugin;
-using PubSubHubBubReciever.DataService.Interface;
-using PubSubHubBubReciever.JSONObject;
-using PubSubHubBubReciever.Service;
+using ServiceLayer.Interface;
+using ServiceLayer.Service;
 using System;
 using System.IO;
 using System.Security.Cryptography;

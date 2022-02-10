@@ -1,7 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using PubSubHubBubReciever.DataService.Interface;
-using PubSubHubBubReciever.JSONObject;
-using PubSubHubBubReciever.Service.Interface;
+﻿using DataLayer.JSONObject;
+using Microsoft.AspNetCore.Mvc;
+using ServiceLayer.Interface;
 using System;
 using System.Linq;
 using System.Security.Cryptography;
@@ -43,7 +42,7 @@ namespace PubSubHubBubReciever.Controllers
             if (string.IsNullOrWhiteSpace(topicUrl))
                 return StatusCode(400);
 
-            var id = new Guid();
+            var id = Guid.NewGuid();
             var idBytes = id.ToByteArray();
             var token = BitConverter.ToString(SHA256.Create().ComputeHash(idBytes)).Replace("-", "").ToLower();
 

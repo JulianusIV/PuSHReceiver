@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace PubSubHubBubReciever.JSONObject
+namespace DataLayer.JSONObject
 {
     public class Leases
     {

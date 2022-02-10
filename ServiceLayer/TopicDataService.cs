@@ -1,13 +1,13 @@
-﻿using PubSubHubBubReciever.DataService.Interface;
-using PubSubHubBubReciever.JSONObject;
-using PubSubHubBubReciever.Repository;
+﻿using DataAccessLayer.Repository;
+using DataLayer.JSONObject;
+using ServiceLayer.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PubSubHubBubReciever.DataService
+namespace ServiceLayer.DataService
 {
-    internal class TopicDataService : ITopicDataService
+    public class TopicDataService : ITopicDataService
     {
         bool ITopicDataService.AddTopic(DataSub dataSub, LeaseSub leaseSub)
         {
@@ -68,6 +68,15 @@ namespace PubSubHubBubReciever.DataService
 
         LeaseSub ITopicDataService.GetLeaseSub(Guid id)
             => TopicRepository.Leases.Subs.Single(x => x.TopicID == id);
+
+        List<DataSub> ITopicDataService.GetSubbedTopics()
+        {
+            return TopicRepository.Data.Subs.Where(x =>
+            {
+                var lease = TopicRepository.Leases.Subs.Single(y => y.TopicID == x.TopicID);
+                return lease.Subscribed;
+            }).ToList();
+        }
 
         void ITopicDataService.UpdateLease(Guid id, bool subscribe, int leaseTime)
         {

@@ -1,15 +1,14 @@
-﻿using PubSubHubBubReciever.DataService.Interface;
-using PubSubHubBubReciever.JSONObject;
-using PubSubHubBubReciever.Service.Interface;
+﻿using DataLayer.JSONObject;
+using ServiceLayer.Interface;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace PubSubHubBubReciever.Service
+namespace ServiceLayer.Service
 {
-    internal class SubscriptionService : ISubscriptionService
+    public class SubscriptionService : ISubscriptionService
     {
         private readonly ITopicDataService dataService;
 
@@ -60,9 +59,10 @@ namespace PubSubHubBubReciever.Service
             return result;
         }
 
-        void ISubscriptionService.UnsubscribeAll()
+        async void ISubscriptionService.UnsubscribeAll()
         {
-            throw new NotImplementedException();
+            foreach (var topic in dataService.GetSubbedTopics())
+                await ((ISubscriptionService)this).SubscribeAsync(topic, false);
         }
     }
 }

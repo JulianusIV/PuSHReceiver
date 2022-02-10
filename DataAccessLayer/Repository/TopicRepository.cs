@@ -1,19 +1,19 @@
-﻿using PubSubHubBubReciever.JSONObject;
+﻿using DataLayer.JSONObject;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 
-namespace PubSubHubBubReciever.Repository
+namespace DataAccessLayer.Repository
 {
-    internal static class TopicRepository
+    public static class TopicRepository
     {
         private static readonly object _lock = new object();
 
-        internal static Data Data { get; set; }
-        internal static Leases Leases { get; set; }
+        public static Data Data { get; set; }
+        public static Leases Leases { get; set; }
 
-        internal static void Load()
+        public static void Load()
         {
             lock (_lock)
             {
@@ -53,7 +53,7 @@ namespace PubSubHubBubReciever.Repository
             }
         }
 
-        internal static void Save(FileNames fileName)
+        public  static void Save(FileNames fileName)
         {
             lock (_lock)
             {
@@ -68,7 +68,7 @@ namespace PubSubHubBubReciever.Repository
         }
     }
 
-    internal enum FileNames
+    public enum FileNames
     {
         data,
         leases

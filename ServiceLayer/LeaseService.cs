@@ -1,13 +1,13 @@
-﻿using PubSubHubBubReciever.DataService;
-using PubSubHubBubReciever.JSONObject;
-using PubSubHubBubReciever.Service.Interface;
+﻿using DataLayer.JSONObject;
+using ServiceLayer.DataService;
+using ServiceLayer.Interface;
 using System;
 using System.Collections.Generic;
 using System.Timers;
 
-namespace PubSubHubBubReciever.Service
+namespace ServiceLayer.Service
 {
-    internal class LeaseService
+    public class LeaseService
     {
         #region Singleton
         private static LeaseService _instance;
@@ -23,7 +23,7 @@ namespace PubSubHubBubReciever.Service
                     return _instance;
                 }
             }
-        } 
+        }
         #endregion
 
         private static Dictionary<Guid, Timer> LeaseTimers { get; } = new Dictionary<Guid, Timer>();
@@ -34,7 +34,7 @@ namespace PubSubHubBubReciever.Service
             subscriptionService = new SubscriptionService(new TopicDataService());
         }
 
-        internal void RegisterLease(DataSub dataSub, int leaseTime)
+        public void RegisterLease(DataSub dataSub, int leaseTime)
         {
             Console.WriteLine($"Scheduling lease renewal for topic {dataSub.TopicID:N} in {leaseTime} seconds ({TimeSpan.FromSeconds(leaseTime).TotalDays} days)");
             if (!LeaseTimers.ContainsKey(dataSub.TopicID))

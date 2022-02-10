@@ -5,17 +5,16 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PubSubHubBubReciever.Controllers;
-using PubSubHubBubReciever.DataService;
-using PubSubHubBubReciever.DataService.Interface;
-using PubSubHubBubReciever.Service;
-using PubSubHubBubReciever.Service.Interface;
+using ServiceLayer.DataService;
+using ServiceLayer.Interface;
+using ServiceLayer.Service;
 using System;
 
 namespace PubSubHubBubReciever
 {
     internal class Startup
     {
-        internal Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
             subscriptionService = new SubscriptionService(new TopicDataService());
@@ -25,7 +24,7 @@ namespace PubSubHubBubReciever
         private readonly ISubscriptionService subscriptionService;
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        internal void ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<ITopicDataService, TopicDataService>();
             services.AddSingleton<ISubscriptionService, SubscriptionService>();
@@ -36,7 +35,7 @@ namespace PubSubHubBubReciever
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        internal void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHostApplicationLifetime lifetime)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHostApplicationLifetime lifetime)
         {
             if (env.IsDevelopment())
             {

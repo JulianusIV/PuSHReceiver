@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace PubSubHubBubReciever.JSONObject
+namespace DataLayer.JSONObject
 {
     public class Data
     {
         public string AdminToken { get; set; }
         public string CallbackURL { get; set; }
+
+        public Dictionary<string, string> PluginData { get; set; }
         public List<DataSub> Subs { get; set; }
     }
 

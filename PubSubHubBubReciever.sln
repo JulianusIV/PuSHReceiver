@@ -13,6 +13,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccessLayer", "DataAcce
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceLayer", "ServiceLayer\ServiceLayer.csproj", "{69E08B0B-C76C-48F7-8143-BB639D0036DE}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DefaultPlugins", "DefaultPlugins", "{BDA59BCE-B62C-44A2-9793-B3D406AECBF7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YouTubeToDiscordPlugin", "YouTubeToDiscordPlugin\YouTubeToDiscordPlugin.csproj", "{84061113-5E35-471D-B01C-67F14C90C205}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,9 +43,16 @@ Global
 		{69E08B0B-C76C-48F7-8143-BB639D0036DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{69E08B0B-C76C-48F7-8143-BB639D0036DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{69E08B0B-C76C-48F7-8143-BB639D0036DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84061113-5E35-471D-B01C-67F14C90C205}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84061113-5E35-471D-B01C-67F14C90C205}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84061113-5E35-471D-B01C-67F14C90C205}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84061113-5E35-471D-B01C-67F14C90C205}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{84061113-5E35-471D-B01C-67F14C90C205} = {BDA59BCE-B62C-44A2-9793-B3D406AECBF7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {93166C04-5A01-45B9-AB17-08BE3AB853DE}

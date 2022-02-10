@@ -1,11 +1,10 @@
-﻿using Plugin.Objects;
+﻿using DataLayer.JSONObject;
+using Plugin.Objects;
 
 namespace Plugin.PublisherPlugin
 {
-    public interface IPublishPlugin
+    public interface IPublishPlugin : IBasePlugin
     {
-        public string Name { get; protected set; }
-
-        public void FeedUpdate(Feed feed);
+        public void FeedUpdate(Feed feed, DataSub dataSub);
     }
 }

@@ -115,23 +115,9 @@ namespace PubSubHubBubReciever.Controllers
 
             var publisher = PluginManager.Instance.ResolvePublishPlugin(dataSub.FeedPublisher);
 
-            publisher.FeedUpdate(feedItem);
+            publisher.FeedUpdate(feedItem, dataSub);
 
             return new OkResult();
-            //XmlSerializer serializer = new XmlSerializer(typeof(feed));
-            //using StringReader stringReader = new StringReader(bodyString);
-            //feed xml = (feed)serializer.Deserialize(stringReader);
-
-            //if (xml.link is null)
-            //{
-            //    Console.WriteLine("Incoming HTTP-POST with improper xml body! Ignoring.");
-            //    return StatusCode(422);
-            //}
-
-            //if (!SubscriptionHandler.VerifyTopicURL(topicId, xml.link.Single(x => x.rel == "self").href))
-            //    return StatusCode(404);
-
-            //Publisher.PublishToDiscord(SubscriptionHandler.GetTopic(topicId), xml.entry.link.href);
         }
     }
 }

@@ -53,7 +53,7 @@ namespace DataAccessLayer.Repository
             }
         }
 
-        public  static void Save(FileNames fileName)
+        public static void Save(FileNames fileName)
         {
             lock (_lock)
             {

@@ -1,7 +1,9 @@
 ﻿using DataLayer.JSONObject;
 using Microsoft.AspNetCore.Mvc;
+using Plugin;
 using ServiceLayer.Interface;
 using System;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -23,20 +25,13 @@ namespace PubSubHubBubReciever.Controllers
         [HttpPost]
         internal IActionResult Post([FromQuery(Name = "adminToken")] string adminToken,
             [FromQuery(Name = "topicUrl")] string topicUrl,
-            [FromQuery(Name = "webhookUrl")] string webhookUrl,
-            [FromQuery(Name = "pubText")] string pubText,
-            [FromQuery(Name = "pubPfp")] string pubPfp,
-            [FromQuery(Name = "pubName")] string pubName,
-            [FromQuery(Name = "Parser")] string parser,
-            [FromQuery(Name = "Publisher")] string publisher)
+            [FromQuery(Name = "Parser")] string parserName,
+            [FromQuery(Name = "Publisher")] string publisherName)
         {
             if (!dataService.VerifyAdminToken(adminToken))
                 return StatusCode(401);
 
             if (string.IsNullOrWhiteSpace(topicUrl))
-                return StatusCode(400);
-
-            if (string.IsNullOrWhiteSpace(webhookUrl))
                 return StatusCode(400);
 
             if (string.IsNullOrWhiteSpace(topicUrl))
@@ -53,21 +48,17 @@ namespace PubSubHubBubReciever.Controllers
 
             var secret = BitConverter.ToString(SHA256.Create().ComputeHash(secretBytes.ToArray())).Replace("-", "").ToLower();
 
-            DataSub topic = new DataSub()
+            DataSub dataSub = new DataSub()
             {
                 TopicID = id,
                 TopicURL = topicUrl,
                 Token = token,
                 Secret = secret,
-                PubText = pubText ?? "@everyone new Upload" + Environment.NewLine,
-                PubProfilePic = pubPfp ?? "https://cdn.discordapp.com/attachments/784535910175735838/935557046747676732/unknown.png",
-                PubName = pubName ?? "PuSH",
-                WebhookURL = webhookUrl,
-                FeedParser = parser ?? "YouTubeXmlParser",
-                FeedPublisher = publisher ?? "DiscordWebhookPublisher"
+                FeedParser = parserName ?? "YouTubeXmlParser",
+                FeedPublisher = publisherName ?? "DiscordWebhookPublisher"
             };
 
-            LeaseSub lease = new LeaseSub()
+            LeaseSub leaseSub = new LeaseSub()
             {
                 TopicID = id,
                 LastLease = DateTime.MinValue,
@@ -75,12 +66,25 @@ namespace PubSubHubBubReciever.Controllers
                 Subscribed = false
             };
 
-            if (!dataService.AddTopic(topic, lease))
+            using var sr = new StreamReader(HttpContext.Request.Body);
+            var bodyString = sr.ReadToEnd();
+
+            var parser = PluginManager.Instance.ResolveParserPlugin(parserName);
+            if (parser is null)
+                return StatusCode(426, $"No parser plugin with name {parserName} is registered");
+            var publisher = PluginManager.Instance.ResolvePublishPlugin(publisherName);
+            if (publisher is null)
+                return StatusCode(426, $"No publisher plugin with name {publisherName} is registered");
+
+            dataSub.ParserData = parser.TopicAdded(dataSub, bodyString.Split(Environment.NewLine));
+            dataSub.PublisherData = publisher.TopicAdded(dataSub, bodyString.Split(Environment.NewLine));
+
+            if (!dataService.AddTopic(dataSub, leaseSub))
                 return StatusCode(500);
 
-            if (!subscriptionService.SubscribeAsync(topic).GetAwaiter().GetResult())
+            if (!subscriptionService.SubscribeAsync(dataSub).GetAwaiter().GetResult())
             {
-                dataService.DeleteTopic(topic, lease);
+                dataService.DeleteTopic(dataSub, leaseSub);
                 return StatusCode(500);
             }
 
@@ -112,10 +116,6 @@ namespace PubSubHubBubReciever.Controllers
         internal IActionResult Patch([FromQuery(Name = "adminToken")] string adminToken,
             [FromQuery(Name = "topicId")] Guid topicId,
             [FromQuery(Name = "topicUrl")] string topicUrl,
-            [FromQuery(Name = "webhookUrl")] string webhookUrl,
-            [FromQuery(Name = "pubText")] string pubText,
-            [FromQuery(Name = "pubPfp")] string pubPfp,
-            [FromQuery(Name = "pubName")] string pubName,
             [FromQuery(Name = "Parser")] string parser,
             [FromQuery(Name = "Publisher")] string publisher)
         {
@@ -132,10 +132,6 @@ namespace PubSubHubBubReciever.Controllers
                 TopicURL = topicUrl ?? dataSub.TopicURL,
                 Token = dataSub.Token,
                 Secret = dataSub.Secret,
-                PubText = pubText ?? dataSub.PubText,
-                PubProfilePic = pubPfp ?? dataSub.PubProfilePic,
-                PubName = pubName ?? dataSub.PubName,
-                WebhookURL = webhookUrl ?? dataSub.WebhookURL,
                 FeedParser = parser ?? dataSub.FeedParser,
                 FeedPublisher = publisher ?? dataSub.FeedPublisher
             };
@@ -147,6 +143,19 @@ namespace PubSubHubBubReciever.Controllers
                 LeaseTime = 0,
                 Subscribed = false
             };
+
+            using var sr = new StreamReader(HttpContext.Request.Body);
+            var bodyString = sr.ReadToEnd();
+
+            var parserPlugin = PluginManager.Instance.ResolveParserPlugin(topic.FeedParser);
+            if (parserPlugin is null)
+                return StatusCode(426, $"No parser plugin with name {topic.FeedParser} is registered");
+            var publisherPlugin = PluginManager.Instance.ResolvePublishPlugin(topic.FeedPublisher);
+            if (publisherPlugin is null)
+                return StatusCode(426, $"No publisher plugin with name {topic.FeedPublisher} is registered");
+
+            dataSub.ParserData = parserPlugin.TopicAdded(dataSub, bodyString.Split(Environment.NewLine));
+            dataSub.PublisherData = publisherPlugin.TopicAdded(dataSub, bodyString.Split(Environment.NewLine));
 
             if (leaseSub.Subscribed)
                 if (!subscriptionService.SubscribeAsync(dataSub, false).GetAwaiter().GetResult())

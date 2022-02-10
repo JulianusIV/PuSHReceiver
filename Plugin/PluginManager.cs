@@ -74,9 +74,9 @@ namespace Plugin
         }
 
         public IParserPlugin ResolveParserPlugin(string name)
-            => parserPlugins.Single(x => x.Name.Equals(name));
+            => parserPlugins.SingleOrDefault(x => x.Name.Equals(name));
 
         public IPublishPlugin ResolvePublishPlugin(string name)
-            =>publishPlugins.Single(x => x.Name.Equals(name));
+            => publishPlugins.SingleOrDefault(x => x.Name.Equals(name));
     }
 }

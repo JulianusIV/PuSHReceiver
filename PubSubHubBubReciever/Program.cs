@@ -1,10 +1,7 @@
 using DataAccessLayer.Repository;
-using DataLayer.JSONObject;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Plugin;
-using System.Collections.Generic;
-using System.Text.Json;
 
 namespace PubSubHubBubReciever
 {

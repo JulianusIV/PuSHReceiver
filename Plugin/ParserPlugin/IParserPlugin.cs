@@ -2,10 +2,8 @@
 
 namespace Plugin.ParserPlugin
 {
-    public interface IParserPlugin
+    public interface IParserPlugin : IBasePlugin
     {
-        public string Name { get; protected set; }
-
         public Feed FeedUpdate(string payload);
     }
 }

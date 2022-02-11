@@ -51,9 +51,7 @@ namespace PubSubHubBubReciever.Controllers
 
                 LeaseService.Instance.RegisterLease(dataSub, lease);
 
-                var result = Content(challenge);
-                result.StatusCode = 200;
-                return result;
+                return Ok(challenge);
             }
             else if (mode == "unsubscribe")
             {
@@ -61,8 +59,7 @@ namespace PubSubHubBubReciever.Controllers
 
                 Console.WriteLine("Recieved unsubscribe request, sending back challenge.");
 
-                var result = Content(challenge);
-                result.StatusCode = 200;
+                var result = Ok(challenge);
 
                 if (dataService.CountSubbedTopics() == 0)
                 {
@@ -117,7 +114,7 @@ namespace PubSubHubBubReciever.Controllers
 
             publisher.FeedUpdate(feedItem, dataSub);
 
-            return new OkResult();
+            return Ok();
         }
     }
 }

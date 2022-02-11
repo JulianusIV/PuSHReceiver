@@ -55,6 +55,7 @@ namespace Plugin
                 if (parserPlugins.Any(x => x.Name == plugin.Name))
                     throw new DuplicatePluginNameException("Plugin manager failed to load parser plugins, due to duplicate plugin names!", plugin.Name);
                 parserPlugins.Add(plugin);
+                Console.WriteLine($"Loaded plugin {plugin.Name}.");
             }
 
             Type publishPluginType = typeof(IPublishPlugin);
@@ -70,6 +71,7 @@ namespace Plugin
                 if (publishPlugins.Any(x => x.Name == plugin.Name))
                     throw new DuplicatePluginNameException("Plugin manager failed to load publish plugins, due to duplicate plugin names!", plugin.Name);
                 publishPlugins.Add(plugin);
+                Console.WriteLine($"Loaded plugin {plugin.Name}.");
             }
         }
 

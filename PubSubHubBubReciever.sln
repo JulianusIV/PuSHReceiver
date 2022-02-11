@@ -7,15 +7,20 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PubSubHubBubReciever", "Pub
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugin", "Plugin\Plugin.csproj", "{62F1E163-7BAE-4722-B51C-BDAECB3D60DA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataLayer", "Data\DataLayer.csproj", "{F7C30EB6-BA96-478E-9CBB-FEBFD66E89BC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataLayer", "Data\DataLayer.csproj", "{F7C30EB6-BA96-478E-9CBB-FEBFD66E89BC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccessLayer", "DataAccessLayer\DataAccessLayer.csproj", "{4A267F75-AF2D-4803-B5C8-5A6AD6571530}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccessLayer", "DataAccessLayer\DataAccessLayer.csproj", "{4A267F75-AF2D-4803-B5C8-5A6AD6571530}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceLayer", "ServiceLayer\ServiceLayer.csproj", "{69E08B0B-C76C-48F7-8143-BB639D0036DE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceLayer", "ServiceLayer\ServiceLayer.csproj", "{69E08B0B-C76C-48F7-8143-BB639D0036DE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DefaultPlugins", "DefaultPlugins", "{BDA59BCE-B62C-44A2-9793-B3D406AECBF7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YouTubeToDiscordPlugin", "YouTubeToDiscordPlugin\YouTubeToDiscordPlugin.csproj", "{84061113-5E35-471D-B01C-67F14C90C205}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YouTubeToDiscordPlugin", "YouTubeToDiscordPlugin\YouTubeToDiscordPlugin.csproj", "{84061113-5E35-471D-B01C-67F14C90C205}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9669A05A-ECFB-4236-8A04-4B2A860C4720}"
+	ProjectSection(SolutionItems) = preProject
+		Dockerfile = Dockerfile
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

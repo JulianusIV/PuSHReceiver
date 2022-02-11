@@ -5,22 +5,30 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PubSubHubBubReciever.Controllers;
+using ServiceLayer.DataService;
+using ServiceLayer.Interface;
+using ServiceLayer.Service;
 using System;
 
 namespace PubSubHubBubReciever
 {
-    public class Startup
+    internal class Startup
     {
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            subscriptionService = new SubscriptionService(new TopicDataService());
         }
 
-        public IConfiguration Configuration { get; }
+        internal IConfiguration Configuration { get; }
+        private readonly ISubscriptionService subscriptionService;
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<ITopicDataService, TopicDataService>();
+            services.AddSingleton<ISubscriptionService, SubscriptionService>();
+
             services.Configure<KestrelServerOptions>(options => options.AllowSynchronousIO = true);
 
             services.AddControllers().AddXmlSerializerFormatters();
@@ -50,13 +58,13 @@ namespace PubSubHubBubReciever
         private void OnAppStarted()
         {
 #if !DEBUG
-            SubscriptionHandler.SubscribeAll(); 
+            subscriptionService.SubscribeAll();
 #endif
         }
 
         private void OnAppStopping()
         {
-            SubscriptionHandler.UnsubscribeAll();
+            subscriptionService.UnsubscribeAll();
 
             Console.WriteLine("Getting cancellation Token and waiting for cancellation or 3 min.");
             var cancellationToken = FeedRecieverController.tokenSource.Token;

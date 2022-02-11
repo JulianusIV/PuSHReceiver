@@ -1,4 +1,4 @@
-﻿namespace PubSubHubBubReciever
+﻿namespace YouTubeToDiscordPlugin.YouTube
 {
 #pragma warning disable IDE1006
     // NOTE: Generated code may require at least .NET Framework 4.5 or .NET Core/Standard 2.0.
@@ -7,7 +7,7 @@
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.w3.org/2005/Atom")]
     [System.Xml.Serialization.XmlRootAttribute(Namespace = "http://www.w3.org/2005/Atom", IsNullable = false)]
-    public partial class feed
+    internal partial class feed
     {
 
         private feedLink[] linkField;
@@ -76,7 +76,7 @@
     [System.SerializableAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.w3.org/2005/Atom")]
-    public partial class feedLink
+    internal partial class feedLink
     {
 
         private string relField;
@@ -116,7 +116,7 @@
     [System.SerializableAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.w3.org/2005/Atom")]
-    public partial class feedEntry
+    internal partial class feedEntry
     {
 
         private string idField;
@@ -246,7 +246,7 @@
     [System.SerializableAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.w3.org/2005/Atom")]
-    public partial class feedEntryLink
+    internal partial class feedEntryLink
     {
 
         private string relField;
@@ -286,7 +286,7 @@
     [System.SerializableAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.w3.org/2005/Atom")]
-    public partial class feedEntryAuthor
+    internal partial class feedEntryAuthor
     {
 
         private string nameField;

@@ -3,7 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PubSubHubBubReciever", "PubSubHubBubReciever\PubSubHubBubReciever.csproj", "{78FC2852-A8FA-4DCC-A588-044BD31544AC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PubSubHubBubReciever", "PubSubHubBubReciever\PubSubHubBubReciever.csproj", "{78FC2852-A8FA-4DCC-A588-044BD31544AC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugin", "Plugin\Plugin.csproj", "{62F1E163-7BAE-4722-B51C-BDAECB3D60DA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataLayer", "Data\DataLayer.csproj", "{F7C30EB6-BA96-478E-9CBB-FEBFD66E89BC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccessLayer", "DataAccessLayer\DataAccessLayer.csproj", "{4A267F75-AF2D-4803-B5C8-5A6AD6571530}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceLayer", "ServiceLayer\ServiceLayer.csproj", "{69E08B0B-C76C-48F7-8143-BB639D0036DE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DefaultPlugins", "DefaultPlugins", "{BDA59BCE-B62C-44A2-9793-B3D406AECBF7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YouTubeToDiscordPlugin", "YouTubeToDiscordPlugin\YouTubeToDiscordPlugin.csproj", "{84061113-5E35-471D-B01C-67F14C90C205}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,9 +27,32 @@ Global
 		{78FC2852-A8FA-4DCC-A588-044BD31544AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{78FC2852-A8FA-4DCC-A588-044BD31544AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{78FC2852-A8FA-4DCC-A588-044BD31544AC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{62F1E163-7BAE-4722-B51C-BDAECB3D60DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62F1E163-7BAE-4722-B51C-BDAECB3D60DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62F1E163-7BAE-4722-B51C-BDAECB3D60DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{62F1E163-7BAE-4722-B51C-BDAECB3D60DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7C30EB6-BA96-478E-9CBB-FEBFD66E89BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7C30EB6-BA96-478E-9CBB-FEBFD66E89BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7C30EB6-BA96-478E-9CBB-FEBFD66E89BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7C30EB6-BA96-478E-9CBB-FEBFD66E89BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A267F75-AF2D-4803-B5C8-5A6AD6571530}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A267F75-AF2D-4803-B5C8-5A6AD6571530}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A267F75-AF2D-4803-B5C8-5A6AD6571530}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A267F75-AF2D-4803-B5C8-5A6AD6571530}.Release|Any CPU.Build.0 = Release|Any CPU
+		{69E08B0B-C76C-48F7-8143-BB639D0036DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69E08B0B-C76C-48F7-8143-BB639D0036DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69E08B0B-C76C-48F7-8143-BB639D0036DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69E08B0B-C76C-48F7-8143-BB639D0036DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84061113-5E35-471D-B01C-67F14C90C205}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84061113-5E35-471D-B01C-67F14C90C205}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84061113-5E35-471D-B01C-67F14C90C205}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84061113-5E35-471D-B01C-67F14C90C205}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{84061113-5E35-471D-B01C-67F14C90C205} = {BDA59BCE-B62C-44A2-9793-B3D406AECBF7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {93166C04-5A01-45B9-AB17-08BE3AB853DE}

@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
-namespace PubSubHubBubReciever.JSONObjects
+namespace DataLayer.JSONObject
 {
     public class Data
     {
@@ -11,14 +12,14 @@ namespace PubSubHubBubReciever.JSONObjects
 
     public class DataSub
     {
-        public long TopicID { get; set; }
+        public Guid TopicID { get; set; }
         public string TopicURL { get; set; }
         public string Token { get; set; }
         public string Secret { get; set; }
-        public string WebhookURL { get; set; }
-        public string PubText { get; set; }
-        public string PubProfilePic { get; set; }
-        public string PubName { get; set; }
+        public string FeedPublisher { get; set; }
+        public string FeedParser { get; set; }
+        public string PublisherData { get; set; }
+        public string ParserData { get; set; }
     }
 
 }

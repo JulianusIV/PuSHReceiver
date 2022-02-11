@@ -7,23 +7,24 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace PubSubHubBubReciever.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    internal class ManageController : ControllerBase
+    public class ManageController : ControllerBase
     {
         private readonly ITopicDataService dataService;
         private readonly ISubscriptionService subscriptionService;
-        internal ManageController(ITopicDataService dataService, ISubscriptionService subscriptionService)
+        public ManageController(ITopicDataService dataService, ISubscriptionService subscriptionService)
         {
             this.dataService = dataService;
             this.subscriptionService = subscriptionService;
         }
 
         [HttpPost]
-        internal IActionResult Post([FromQuery(Name = "adminToken")] string adminToken,
+        public async Task<IActionResult> Post([FromQuery(Name = "adminToken")] string adminToken,
             [FromQuery(Name = "topicUrl")] string topicUrl,
             [FromQuery(Name = "Parser")] string parserName,
             [FromQuery(Name = "Publisher")] string publisherName)
@@ -54,8 +55,8 @@ namespace PubSubHubBubReciever.Controllers
                 TopicURL = topicUrl,
                 Token = token,
                 Secret = secret,
-                FeedParser = parserName ?? "YouTubeXmlParser",
-                FeedPublisher = publisherName ?? "DiscordWebhookPublisher"
+                FeedParser = parserName is null ? "YouTubeXmlParser" : parserName,
+                FeedPublisher = publisherName is null ? "DiscordWebhookPublisher" : publisherName
             };
 
             LeaseSub leaseSub = new LeaseSub()
@@ -67,14 +68,14 @@ namespace PubSubHubBubReciever.Controllers
             };
 
             using var sr = new StreamReader(HttpContext.Request.Body);
-            var bodyString = sr.ReadToEnd();
+            var bodyString = await sr.ReadToEndAsync();
 
-            var parser = PluginManager.Instance.ResolveParserPlugin(parserName);
+            var parser = PluginManager.Instance.ResolveParserPlugin(dataSub.FeedParser);
             if (parser is null)
-                return StatusCode(426, $"No parser plugin with name {parserName} is registered");
-            var publisher = PluginManager.Instance.ResolvePublishPlugin(publisherName);
+                return StatusCode(426, $"No parser plugin with name {dataSub.FeedParser} is registered");
+            var publisher = PluginManager.Instance.ResolvePublishPlugin(dataSub.FeedPublisher);
             if (publisher is null)
-                return StatusCode(426, $"No publisher plugin with name {publisherName} is registered");
+                return StatusCode(426, $"No publisher plugin with name {dataSub.FeedParser} is registered");
 
             dataSub.ParserData = parser.TopicAdded(dataSub, bodyString.Split(Environment.NewLine));
             dataSub.PublisherData = publisher.TopicAdded(dataSub, bodyString.Split(Environment.NewLine));
@@ -82,7 +83,7 @@ namespace PubSubHubBubReciever.Controllers
             if (!dataService.AddTopic(dataSub, leaseSub))
                 return StatusCode(500);
 
-            if (!subscriptionService.SubscribeAsync(dataSub).GetAwaiter().GetResult())
+            if (!await subscriptionService.SubscribeAsync(dataSub))
             {
                 dataService.DeleteTopic(dataSub, leaseSub);
                 return StatusCode(500);
@@ -92,7 +93,7 @@ namespace PubSubHubBubReciever.Controllers
         }
 
         [HttpDelete]
-        internal IActionResult Delete([FromQuery(Name = "adminToken")] string adminToken,
+        public async Task<IActionResult> Delete([FromQuery(Name = "adminToken")] string adminToken,
             [FromQuery(Name = "topicId")] Guid topicId)
         {
             if (!dataService.VerifyAdminToken(adminToken))
@@ -103,7 +104,7 @@ namespace PubSubHubBubReciever.Controllers
             var dataSub = dataService.GetDataSub(topicId);
 
             if (leaseSub.Subscribed)
-                if (!subscriptionService.SubscribeAsync(dataSub, false).GetAwaiter().GetResult())
+                if (!await subscriptionService.SubscribeAsync(dataSub, false))
                     return StatusCode(500);
 
             if (!dataService.DeleteTopic(dataSub, leaseSub))
@@ -113,7 +114,7 @@ namespace PubSubHubBubReciever.Controllers
         }
 
         [HttpPatch]
-        internal IActionResult Patch([FromQuery(Name = "adminToken")] string adminToken,
+        public async Task<IActionResult> Patch([FromQuery(Name = "adminToken")] string adminToken,
             [FromQuery(Name = "topicId")] Guid topicId,
             [FromQuery(Name = "topicUrl")] string topicUrl,
             [FromQuery(Name = "Parser")] string parser,
@@ -145,7 +146,7 @@ namespace PubSubHubBubReciever.Controllers
             };
 
             using var sr = new StreamReader(HttpContext.Request.Body);
-            var bodyString = sr.ReadToEnd();
+            var bodyString = await sr.ReadToEndAsync();
 
             var parserPlugin = PluginManager.Instance.ResolveParserPlugin(topic.FeedParser);
             if (parserPlugin is null)
@@ -158,7 +159,7 @@ namespace PubSubHubBubReciever.Controllers
             dataSub.PublisherData = publisherPlugin.TopicAdded(dataSub, bodyString.Split(Environment.NewLine));
 
             if (leaseSub.Subscribed)
-                if (!subscriptionService.SubscribeAsync(dataSub, false).GetAwaiter().GetResult())
+                if (!await subscriptionService.SubscribeAsync(dataSub, false))
                     return StatusCode(500);
 
             if (!dataService.UpdateTopic(topic, lease))
@@ -166,14 +167,34 @@ namespace PubSubHubBubReciever.Controllers
 
             if (leaseSub.Subscribed)
             {
-                if (!subscriptionService.SubscribeAsync(topic).GetAwaiter().GetResult())
+                if (!await subscriptionService.SubscribeAsync(topic))
                 {
                     dataService.UpdateTopic(dataSub, leaseSub);
                     return StatusCode(500);
                 }
             }
+            else
+                return Ok("Topic is currently not subscribed, inputs have not been verified!");
 
             return Ok();
+        }
+
+        [HttpPost]
+        [Route("ToggleSub")]
+        public async Task<IActionResult> ToggleSubscription([FromQuery(Name = "adminToken")] string adminToken,
+            [FromQuery(Name = "topicId")] Guid topicId)
+        {
+            if (!dataService.VerifyAdminToken(adminToken))
+                return StatusCode(401);
+
+            if (!(dataService.GetLeaseSub(topicId) is LeaseSub leaseSub))
+                return StatusCode(404);
+            var dataSub = dataService.GetDataSub(topicId);
+
+            if (!await subscriptionService.SubscribeAsync(dataSub, !leaseSub.Subscribed))
+                return StatusCode(500);
+
+            return Ok("Status changed to: " + leaseSub.Subscribed);
         }
     }
 }

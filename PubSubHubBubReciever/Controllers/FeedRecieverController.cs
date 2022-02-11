@@ -14,20 +14,20 @@ namespace PubSubHubBubReciever.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    internal class FeedRecieverController : ControllerBase
+    public class FeedRecieverController : ControllerBase
     {
         public static CancellationTokenSource tokenSource = new CancellationTokenSource();
 
         private readonly ITopicDataService dataService;
 
-        internal FeedRecieverController(ITopicDataService dataService)
+        public FeedRecieverController(ITopicDataService dataService)
         {
             this.dataService = dataService;
         }
 
         [HttpGet]
         [Route("{topicId}")]
-        internal IActionResult Get([FromRoute] Guid topicId,
+        public IActionResult Get([FromRoute] Guid topicId,
             [FromQuery(Name = "hub.topic")] string hubTopic,
             [FromQuery(Name = "hub.challenge")] string challenge,
             [FromQuery(Name = "hub.mode")] string mode,
@@ -78,7 +78,7 @@ namespace PubSubHubBubReciever.Controllers
         [HttpPost]
         [Route("{topicId}")]
         [Consumes("application/xml")]
-        internal IActionResult Post([FromRoute] Guid topicId)
+        public IActionResult Post([FromRoute] Guid topicId)
         {
             Console.WriteLine($"Incomping HTTP-POST for topic {topicId}");
 

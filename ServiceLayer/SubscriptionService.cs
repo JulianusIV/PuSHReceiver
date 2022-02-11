@@ -2,6 +2,7 @@
 using ServiceLayer.Interface;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -48,12 +49,13 @@ namespace ServiceLayer.Service
             };
             request.Content = new FormUrlEncodedContent(formList);
 
+
             var response = await client.SendAsync(request);
             var result = response.StatusCode == HttpStatusCode.NoContent;
             if (!result)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(response.StatusCode + " - " + response.Content.ReadAsStringAsync().GetAwaiter().GetResult());
+                Console.WriteLine(response.StatusCode + " - " + await response.Content.ReadAsStringAsync());
                 Console.ForegroundColor = ConsoleColor.Gray;
             }
             return result;

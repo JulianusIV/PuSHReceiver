@@ -7,25 +7,49 @@
 
 ## Why?
 
-There are many Solutions to forward YouTube notifications to Webhooks, like [IFTTT](https://ifttt.com/) or [Zapier](https://zapier.com/), however these have to poll the YouTube API (at least in Zapiers case) which is not only slow, but can also cause problems like exceeding quota limits. This is using a service provided by Google, that only requires communication between the servers once on startup and once everytime the lease is renewed, and whenever a item is added to the feed. That makes it so this is incredibly fast (current tests have not been slower than around 30 seconds) and doesnt constantly take up network resources, or eat away on quota.
+There are many Solutions to forward YouTube notifications to Webhooks, like [IFTTT](https://ifttt.com/) or [Zapier](https://zapier.com/), however these have to poll the YouTube API (at least in Zapier's case) which is not only slow, but can also cause problems like exceeding quota limits. This is using a service provided by Google, that only requires communication between the servers once on startup and once every time the lease is renewed, and whenever an item is added to the feed. That makes this incredibly fast (current tests have not been slower than around 30 seconds) and doesn't constantly take up network resources, or eat away on quota.
 
 ## How does it work?
 
-On Startup completion the program reads the topics from the ``data.json`` file, and subscribes to them at the hub, this triggers a HTTP-GET from to haub to the given callback url. The callback url is a base url, like ``https://my-reciever/FeedSubscriber`` with the TopicID appended to it ``https://my-reciever/FeedSubscriber/<topic_id>``
+On Startup completion the program reads the topics from the ``data.json`` file, and subscribes to them at the hub, this triggers an HTTP-GET from the hub to the given callback URL. The callback URL is a base URL, like ``https://my-reciever/FeedSubscriber`` with the TopicID appended to it ``https://my-reciever/FeedSubscriber/<topic_id>``
 The API Processes this request and sends back the ``hub.challenge`` parameter, if the request was valid, which completes the subscribe action.
-On recieving a new subscribe a lease refresh is also scheduled using a timer with the lease time given in the ``hub.lease_seconds`` parameter of the previous GET method.
-Whenever that timer runs through the subscription flow is triggered again.
+On receiving a new subscribe, a lease refresh is also scheduled using a timer with the lease time given in the ``hub.lease_seconds`` parameter of the previous GET method.
+Whenever that timer runs out, the subscription flow is triggered again.
 
-Whenever a new item is added to the feed the hub sends a HTTP-POST, which is again verified, and upon verification gets passed to a discord webhook, to send out the notification on discord.
+Whenever a new item is added to the feed the hub sends an HTTP-POST, which is again verified, and upon verification gets passed to a discord webhook, to send out the notification on discord.
 
 ## How to use
 
 ### Setup
 
-Currently this is in early development, so i cannot give any guarantee on stability, and any changeset might break at any time.
-If you want to set this up on your own Server anyways you can either find the latest commit on [Docker Hub](https://hub.docker.com/r/julianusiv/pubsubhubbubreciever/tags), or you can build this repository yourself (I will be setting up releases in the future aswell) and run the executable on your server.
+Currently, this is in early development, so I cannot give any guarantee on stability, and any changeset might break at any time.
+If you want to set this up on your own Server anyway, you can either find the latest commit on [Docker Hub](https://hub.docker.com/r/julianusiv/pubsubhubbubreciever/tags), or you can build this repository yourself (I will be setting up releases in the future as well) and run the executable on your server.
 
-As you might have noticed this also needs a Domain for the Callback URL, and since it sends and recieves tokens and secrets to ensure the identity of the hub aswell as the admin(you) it is highly adviced to force SSL for this Callback URL. On my own server this is done using [Nginx](https://www.nginx.com/), forcing SSL and forwarding the requests to Port 80 of a Docker container.
+If you want to run this with Docker you can either use run:
+
+```sh
+docker run --name=PuSHReciever \
+  -v $PWD/data.json:/app/data.json \
+  -v $PWD/leases.json:/app/leases.json \
+  -d julianusiv/pubsubhubbubreciever:latest
+```
+
+or use a compose file similar to this:
+
+```yml
+version: '3.5'
+services:
+  app:
+    image: "julianusiv/pubsubhubbubreciever:latest"
+    restart: always
+    volumes:
+      - ./data.json:/app/data.json
+      - ./leases.json:/app/leases.json
+    ports:
+      - 80:80
+```
+
+As you might have noticed this also needs a Domain for the Callback URL, and since it sends and receives tokens and secrets to ensure the identity of the hub as well as the admin(you) it is highly advised to force SSL for this Callback URL. On my own server this is done using [Nginx](https://www.nginx.com/), forcing SSL and forwarding the requests to Port 80 of a Docker container.
 
 ### Usage
 

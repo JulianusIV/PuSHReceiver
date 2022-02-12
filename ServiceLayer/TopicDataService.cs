@@ -49,7 +49,7 @@ namespace ServiceLayer.DataService
         }
 
         string ITopicDataService.GetCallback(ulong id)
-            => TopicRepository.Data.CallbackURL + "/" + id.ToString("N");
+            => TopicRepository.Data.CallbackURL + "/" + id.ToString();
 
         DataSub ITopicDataService.GetDataSub(ulong id)
             => TopicRepository.Data.Subs.SingleOrDefault(x => x.TopicID == id);

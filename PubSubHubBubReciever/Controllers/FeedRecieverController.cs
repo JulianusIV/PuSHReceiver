@@ -39,10 +39,10 @@ namespace PubSubHubBubReciever.Controllers
             if (!(dataService.GetDataSub(topicId) is DataSub dataSub))
                 return StatusCode(404);
 
-            if (token == dataSub.Token)
+            if (token != dataSub.Token)
                 return StatusCode(498);
 
-            if (hubTopic == dataSub.TopicURL)
+            if (hubTopic != dataSub.TopicURL)
                 return StatusCode(404);
 
             if (mode == "subscribe")

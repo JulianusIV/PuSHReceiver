@@ -1,10 +1,14 @@
 {
 	"Subs":[
 		{
-			"TopicID": "00000000-0000-0000-0000-000000000000",
+			"TopicID": 0,
 			"LastLease": "0001-01-01T00:00:00",
 			"LeaseTime": 0,
-			"Subscribed": false
+			"Subscribed": false,
+			"FeedParser": null,
+			"FeedPublisher": null,
+			"ParserData": null
+			"PublisherData": null,
 		}
 	]
 }

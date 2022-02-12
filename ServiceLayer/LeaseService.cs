@@ -36,7 +36,7 @@ namespace ServiceLayer.Service
 
         public void RegisterLease(DataSub dataSub, int leaseTime)
         {
-            Console.WriteLine($"Scheduling lease renewal for topic {dataSub.TopicID:N} in {leaseTime} seconds ({TimeSpan.FromSeconds(leaseTime).TotalDays} days)");
+            Console.WriteLine($"Scheduling lease renewal for topic {dataSub.TopicID} in {leaseTime} seconds ({TimeSpan.FromSeconds(leaseTime).TotalDays} days)");
             if (!LeaseTimers.ContainsKey(dataSub.TopicID))
                 LeaseTimers.Add(dataSub.TopicID, new Timer());
 

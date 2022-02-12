@@ -35,17 +35,18 @@ namespace ServiceLayer.Service
             Console.WriteLine("Requesting new subscription");
             using var client = new HttpClient();
             using var request = new HttpRequestMessage();
+
             request.RequestUri = new Uri("https://pubsubhubbub.appspot.com/subscribe");
             request.Method = HttpMethod.Post;
-
-            var formList = new List<KeyValuePair<string, string>>
+            Console.WriteLine( request.RequestUri);
+            var formList = new Dictionary<string, string>()
             {
-                new KeyValuePair<string, string>("hub.mode", subscribe ? "subscribe" : "unsubscribe"),
-                new KeyValuePair<string, string>("hub.topic", dataSub.TopicURL),
-                new KeyValuePair<string, string>("hub.callback", dataService.GetCallback(dataSub.TopicID)),
-                new KeyValuePair<string, string>("hub.verify", "sync"),
-                new KeyValuePair<string, string>("hub.secret", dataSub.Secret),
-                new KeyValuePair<string, string>("hub.verify_token", dataSub.Token)
+                { "hub.mode", subscribe ? "subscribe" : "unsubscribe" },
+                { "hub.topic", dataSub.TopicURL },
+                { "hub.callback", dataService.GetCallback(dataSub.TopicID) },
+                { "hub.verify", "sync" },
+                { "hub.secret", dataSub.Secret },
+                { "hub.verify_token", dataSub.Token }
             };
             request.Content = new FormUrlEncodedContent(formList);
 

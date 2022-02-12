@@ -26,7 +26,7 @@ namespace ServiceLayer.Service
         }
         #endregion
 
-        private static Dictionary<Guid, Timer> LeaseTimers { get; } = new Dictionary<Guid, Timer>();
+        private static Dictionary<ulong, Timer> LeaseTimers { get; } = new Dictionary<ulong, Timer>();
 
         private readonly ISubscriptionService subscriptionService;
         public LeaseService()

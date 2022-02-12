@@ -12,7 +12,7 @@ namespace DataLayer.JSONObject
 
     public class DataSub
     {
-        public Guid TopicID { get; set; }
+        public ulong TopicID { get; set; }
         public string TopicURL { get; set; }
         public string Token { get; set; }
         public string Secret { get; set; }

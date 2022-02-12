@@ -48,10 +48,10 @@ namespace ServiceLayer.DataService
             return true;
         }
 
-        string ITopicDataService.GetCallback(Guid id)
+        string ITopicDataService.GetCallback(ulong id)
             => TopicRepository.Data.CallbackURL + "/" + id.ToString("N");
 
-        DataSub ITopicDataService.GetDataSub(Guid id)
+        DataSub ITopicDataService.GetDataSub(ulong id)
             => TopicRepository.Data.Subs.SingleOrDefault(x => x.TopicID == id);
 
         (List<DataSub>, List<LeaseSub>) ITopicDataService.GetExpiredAndRunningSubs()
@@ -66,7 +66,7 @@ namespace ServiceLayer.DataService
             return (expired, running);
         }
 
-        LeaseSub ITopicDataService.GetLeaseSub(Guid id)
+        LeaseSub ITopicDataService.GetLeaseSub(ulong id)
             => TopicRepository.Leases.Subs.Single(x => x.TopicID == id);
 
         List<DataSub> ITopicDataService.GetSubbedTopics()
@@ -78,7 +78,7 @@ namespace ServiceLayer.DataService
             }).ToList();
         }
 
-        void ITopicDataService.UpdateLease(Guid id, bool subscribe, int leaseTime)
+        void ITopicDataService.UpdateLease(ulong id, bool subscribe, int leaseTime)
         {
             var lease = TopicRepository.Leases.Subs.Single(x => x.TopicID == id);
             lease.LeaseTime = leaseTime;

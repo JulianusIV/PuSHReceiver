@@ -38,8 +38,8 @@ namespace PubSubHubBubReciever.Controllers
             if (string.IsNullOrWhiteSpace(topicUrl))
                 return StatusCode(400);
 
-            var id = Guid.NewGuid();
-            var idBytes = id.ToByteArray();
+            var id = ulong.Parse(new Random().Next(10000000, 100000000).ToString() + DateTimeOffset.Now.ToUnixTimeSeconds().ToString());
+            var idBytes = BitConverter.GetBytes(id);
             var token = BitConverter.ToString(SHA256.Create().ComputeHash(idBytes)).Replace("-", "").ToLower();
 
             var tokenBytes = Encoding.UTF8.GetBytes(token);
@@ -94,7 +94,7 @@ namespace PubSubHubBubReciever.Controllers
 
         [HttpDelete]
         public async Task<IActionResult> Delete([FromQuery(Name = "adminToken")] string adminToken,
-            [FromQuery(Name = "topicId")] Guid topicId)
+            [FromQuery(Name = "topicId")] ulong topicId)
         {
             if (!dataService.VerifyAdminToken(adminToken))
                 return StatusCode(401);
@@ -115,7 +115,7 @@ namespace PubSubHubBubReciever.Controllers
 
         [HttpPatch]
         public async Task<IActionResult> Patch([FromQuery(Name = "adminToken")] string adminToken,
-            [FromQuery(Name = "topicId")] Guid topicId,
+            [FromQuery(Name = "topicId")] ulong topicId,
             [FromQuery(Name = "topicUrl")] string topicUrl,
             [FromQuery(Name = "Parser")] string parser,
             [FromQuery(Name = "Publisher")] string publisher)
@@ -182,7 +182,7 @@ namespace PubSubHubBubReciever.Controllers
         [HttpPost]
         [Route("ToggleSub")]
         public async Task<IActionResult> ToggleSubscription([FromQuery(Name = "adminToken")] string adminToken,
-            [FromQuery(Name = "topicId")] Guid topicId)
+            [FromQuery(Name = "topicId")] ulong topicId)
         {
             if (!dataService.VerifyAdminToken(adminToken))
                 return StatusCode(401);

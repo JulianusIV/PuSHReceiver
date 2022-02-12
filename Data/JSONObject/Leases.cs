@@ -10,7 +10,7 @@ namespace DataLayer.JSONObject
 
     public class LeaseSub
     {
-        public Guid TopicID { get; set; }
+        public ulong TopicID { get; set; }
         public DateTime LastLease { get; set; }
         public int LeaseTime { get; set; }
         public bool Subscribed { get; set; }

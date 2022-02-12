@@ -16,7 +16,7 @@ namespace YouTubeToDiscordPlugin.Discord
 {
     public class DiscordWebhookPublisher : IPublishPlugin
     {
-        private readonly Dictionary<Guid, byte[]> lastPublishHashes = new Dictionary<Guid, byte[]>();
+        private readonly Dictionary<ulong, byte[]> lastPublishHashes = new Dictionary<ulong, byte[]>();
 
         public string Name => "DiscordWebhookPublisher";
 

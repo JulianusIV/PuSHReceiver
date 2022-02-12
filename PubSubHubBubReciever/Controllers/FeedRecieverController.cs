@@ -27,7 +27,7 @@ namespace PubSubHubBubReciever.Controllers
 
         [HttpGet]
         [Route("{topicId}")]
-        public IActionResult Get([FromRoute] Guid topicId,
+        public IActionResult Get([FromRoute] ulong topicId,
             [FromQuery(Name = "hub.topic")] string hubTopic,
             [FromQuery(Name = "hub.challenge")] string challenge,
             [FromQuery(Name = "hub.mode")] string mode,
@@ -78,7 +78,7 @@ namespace PubSubHubBubReciever.Controllers
         [HttpPost]
         [Route("{topicId}")]
         [Consumes("application/xml")]
-        public IActionResult Post([FromRoute] Guid topicId)
+        public IActionResult Post([FromRoute] ulong topicId)
         {
             Console.WriteLine($"Incomping HTTP-POST for topic {topicId}");
 

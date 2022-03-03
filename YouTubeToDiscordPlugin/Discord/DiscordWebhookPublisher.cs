@@ -14,32 +14,28 @@ namespace YouTubeToDiscordPlugin.Discord
 {
     public class DiscordWebhookPublisher : IPublishPlugin
     {
-        private static readonly Dictionary<ulong, byte[]> lastPublishHashes = new Dictionary<ulong, byte[]>();
+        private static readonly Dictionary<ulong, string> lastPublishUrls = new Dictionary<ulong, string>();
 
         public string Name => "DiscordWebhookPublisher";
 
         public void FeedUpdate(Feed feed, DataSub dataSub)
         {
-            PluginDataObject pluginData = JsonSerializer.Deserialize<PluginDataObject>(dataSub.PublisherData);
-
-            using WebClient webClient = new WebClient();
-            var pubText = Regex.Unescape(pluginData.PubText);
-
-            var hash = SHA1.Create().ComputeHash(Encoding.UTF8.GetBytes(pubText));
-            if (lastPublishHashes.ContainsKey(dataSub.TopicID))
+            if (lastPublishUrls.ContainsKey(dataSub.TopicID))
             {
-                if (hash == lastPublishHashes[dataSub.TopicID])
+                if (feed.ItemURL == lastPublishUrls[dataSub.TopicID])
                     return;
                 else
-                    lastPublishHashes[dataSub.TopicID] = hash;
+                    lastPublishUrls[dataSub.TopicID] = feed.ItemURL;
             }
             else
-                lastPublishHashes.Add(dataSub.TopicID, hash);
+                lastPublishUrls.Add(dataSub.TopicID, feed.ItemURL);
+            
+            PluginDataObject pluginData = JsonSerializer.Deserialize<PluginDataObject>(dataSub.PublisherData);
 
-            webClient.UploadValues(pluginData.WebhookURL, new NameValueCollection
+            new WebClient().UploadValues(pluginData.WebhookURL, new NameValueCollection
             {
                 { "username", pluginData.PubName },
-                { "content", pubText + " " + feed.ItemURL },
+                { "content", Regex.Unescape(pluginData.PubText) + " " + feed.ItemURL },
                 { "avatar_url", pluginData.PubPfp }
             });
         }

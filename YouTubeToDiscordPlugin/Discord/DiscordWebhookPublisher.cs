@@ -1,12 +1,10 @@
 ﻿using DataLayer.JSONObject;
 using Plugin.Objects;
 using Plugin.PublisherPlugin;
-using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Net;
-using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -16,7 +14,7 @@ namespace YouTubeToDiscordPlugin.Discord
 {
     public class DiscordWebhookPublisher : IPublishPlugin
     {
-        private readonly Dictionary<ulong, byte[]> lastPublishHashes = new Dictionary<ulong, byte[]>();
+        private static readonly Dictionary<ulong, byte[]> lastPublishHashes = new Dictionary<ulong, byte[]>();
 
         public string Name => "DiscordWebhookPublisher";
 

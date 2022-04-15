@@ -3,6 +3,7 @@ using ServiceLayer.DataService;
 using ServiceLayer.Interface;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Timers;
 
 namespace ServiceLayer.Service
@@ -36,6 +37,7 @@ namespace ServiceLayer.Service
 
         public void RegisterLease(DataSub dataSub, int leaseTime)
         {
+            bool subscriptionInProgress = false;
             Console.WriteLine($"Scheduling lease renewal for topic {dataSub.TopicID} in {leaseTime} seconds ({TimeSpan.FromSeconds(leaseTime).TotalDays} days)");
             if (!LeaseTimers.ContainsKey(dataSub.TopicID))
                 LeaseTimers.Add(dataSub.TopicID, new Timer());
@@ -43,7 +45,17 @@ namespace ServiceLayer.Service
             LeaseTimers[dataSub.TopicID].Stop();
             LeaseTimers[dataSub.TopicID].Interval = TimeSpan.FromSeconds(leaseTime).TotalMilliseconds;
             LeaseTimers[dataSub.TopicID].AutoReset = false;
-            LeaseTimers[dataSub.TopicID].Elapsed += async (sender, e) => await subscriptionService.SubscribeAsync(dataSub);
+            LeaseTimers[dataSub.TopicID].Elapsed += async (sender, e) =>
+            {
+                //prevent multiple invocations
+                if (!subscriptionInProgress)
+                {
+                    subscriptionInProgress = true;
+                    await subscriptionService.SubscribeAsync(dataSub);
+                    await Task.Delay(100);
+                    subscriptionInProgress = false;
+                }
+            };
             LeaseTimers[dataSub.TopicID].Start();
         }
     }

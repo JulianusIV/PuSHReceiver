@@ -2,7 +2,6 @@
 using ServiceLayer.Interface;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -38,7 +37,7 @@ namespace ServiceLayer.Service
 
             request.RequestUri = new Uri("https://pubsubhubbub.appspot.com/subscribe");
             request.Method = HttpMethod.Post;
-            Console.WriteLine( request.RequestUri);
+            Console.WriteLine(request.RequestUri);
             var formList = new Dictionary<string, string>()
             {
                 { "hub.mode", subscribe ? "subscribe" : "unsubscribe" },

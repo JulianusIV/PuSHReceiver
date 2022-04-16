@@ -3,7 +3,6 @@ using ServiceLayer.DataService;
 using ServiceLayer.Interface;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Timers;
 
 namespace ServiceLayer.Service
@@ -27,6 +26,7 @@ namespace ServiceLayer.Service
         }
         #endregion
 
+        private static readonly object _padlock = new object();
         private static Dictionary<ulong, Timer> LeaseTimers { get; } = new Dictionary<ulong, Timer>();
 
         private readonly ISubscriptionService subscriptionService;
@@ -37,26 +37,27 @@ namespace ServiceLayer.Service
 
         public void RegisterLease(DataSub dataSub, int leaseTime)
         {
-            bool subscriptionInProgress = false;
-            Console.WriteLine($"Scheduling lease renewal for topic {dataSub.TopicID} in {leaseTime} seconds ({TimeSpan.FromSeconds(leaseTime).TotalDays} days)");
-            if (!LeaseTimers.ContainsKey(dataSub.TopicID))
-                LeaseTimers.Add(dataSub.TopicID, new Timer());
-
-            LeaseTimers[dataSub.TopicID].Stop();
-            LeaseTimers[dataSub.TopicID].Interval = TimeSpan.FromSeconds(leaseTime).TotalMilliseconds;
-            LeaseTimers[dataSub.TopicID].AutoReset = false;
-            LeaseTimers[dataSub.TopicID].Elapsed += async (sender, e) =>
+            lock (_padlock)
             {
-                //prevent multiple invocations
-                if (!subscriptionInProgress)
-                {
-                    subscriptionInProgress = true;
-                    await subscriptionService.SubscribeAsync(dataSub);
-                    await Task.Delay(100);
-                    subscriptionInProgress = false;
-                }
-            };
-            LeaseTimers[dataSub.TopicID].Start();
+                Console.WriteLine($"Scheduling lease renewal for topic {dataSub.TopicID} in {leaseTime} seconds ({TimeSpan.FromSeconds(leaseTime).TotalDays} days)");
+
+                var timer = GetTimer(dataSub);
+                timer.Stop();
+                timer.Interval = TimeSpan.FromSeconds(leaseTime).TotalMilliseconds;
+                timer.AutoReset = false;
+                timer.Start();
+            }
+        }
+
+        private Timer GetTimer(DataSub dataSub)
+        {
+            if (LeaseTimers.ContainsKey(dataSub.TopicID))
+                return LeaseTimers[dataSub.TopicID];
+
+            var timer = new Timer();
+            timer.Elapsed += async (sender, e) => await subscriptionService.SubscribeAsync(dataSub);
+            LeaseTimers.Add(dataSub.TopicID, timer);
+            return timer;
         }
     }
 }

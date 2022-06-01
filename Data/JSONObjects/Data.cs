@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-
-namespace DataLayer.JSONObject
+﻿namespace Data.JSONObjects
 {
+#pragma warning disable CS8618
     public class Data
     {
         public string AdminToken { get; set; }
@@ -20,5 +19,5 @@ namespace DataLayer.JSONObject
         public string PublisherData { get; set; }
         public string ParserData { get; set; }
     }
-
+#pragma warning restore CS8618
 }

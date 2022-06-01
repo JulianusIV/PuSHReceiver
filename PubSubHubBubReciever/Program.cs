@@ -1,7 +1,6 @@
-using DataAccessLayer.Repository;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
-using Plugin;
+using Services;
 
 namespace PubSubHubBubReciever
 {
@@ -9,8 +8,8 @@ namespace PubSubHubBubReciever
     {
         public static void Main(string[] args)
         {
-            TopicRepository.Load();
-            PluginManager.Instance.Load();
+            var test = Runtime.Instance.ServiceLoader.ResolveService<ITopicDataService>().AddTopic(new(), new());
+
             CreateHostBuilder(args).Build().Run();
         }
 

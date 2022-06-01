@@ -6,7 +6,7 @@
 			"TopicID": 0,
 			"TopicURL": "https://www.youtube.com/xml/feeds/videos.xml?channel_id=my_channel_id",
 			"Token": "my_token",
-			"Secret": "my_secret",
+			"Secret": "my_secret"
 		}
 	]
 }

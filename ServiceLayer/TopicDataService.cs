@@ -1,118 +1,63 @@
-﻿using DataAccessLayer.Repository;
-using DataLayer.JSONObject;
-using ServiceLayer.Interface;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Data.JSONObjects;
+using Services;
 
-namespace ServiceLayer.DataService
+namespace ServiceLayer
 {
     public class TopicDataService : ITopicDataService
     {
-        bool ITopicDataService.AddTopic(DataSub dataSub, LeaseSub leaseSub)
+        public bool AddTopic(DataSub dataSub, LeaseSub leaseSub)
         {
-            TopicRepository.Data.Subs.Add(dataSub);
-            TopicRepository.Leases.Subs.Add(leaseSub);
-            try
-            {
-                TopicRepository.Save(FileNames.data);
-                TopicRepository.Save(FileNames.leases);
-            }
-            catch (Exception)
-            {
-                TopicRepository.Data.Subs.Remove(dataSub);
-                TopicRepository.Leases.Subs.Remove(leaseSub);
-                return false;
-            }
-            return true;
+            throw new NotImplementedException();
         }
 
-        int ITopicDataService.CountSubbedTopics()
-            => TopicRepository.Leases.Subs.Count(x => x.Subscribed);
-
-        bool ITopicDataService.DeleteTopic(DataSub dataSub, LeaseSub leaseSub)
+        public int CountSubbedTopics()
         {
-            TopicRepository.Data.Subs.Remove(dataSub);
-            TopicRepository.Leases.Subs.Remove(leaseSub);
-            try
-            {
-                TopicRepository.Save(FileNames.data);
-                TopicRepository.Save(FileNames.leases);
-            }
-            catch (Exception)
-            {
-                TopicRepository.Data.Subs.Add(dataSub);
-                TopicRepository.Leases.Subs.Add(leaseSub);
-                return false;
-            }
-            return true;
+            throw new NotImplementedException();
         }
 
-        string ITopicDataService.GetCallback(ulong id)
-            => TopicRepository.Data.CallbackURL + "/" + id.ToString();
-
-        DataSub ITopicDataService.GetDataSub(ulong id)
-            => TopicRepository.Data.Subs.SingleOrDefault(x => x.TopicID == id);
-
-        (List<DataSub>, List<LeaseSub>) ITopicDataService.GetExpiredAndRunningSubs()
+        public bool DeleteTopic(DataSub dataSub, LeaseSub leaseSub)
         {
-            var expired = TopicRepository.Data.Subs.Where(x =>
-            {
-                var lease = TopicRepository.Leases.Subs.Single(y => y.TopicID == x.TopicID);
-                var leaseExpiration = lease.LastLease + TimeSpan.FromSeconds(lease.LeaseTime);
-                return leaseExpiration < DateTime.Now || !lease.Subscribed;
-            }).ToList();
-            var running = TopicRepository.Leases.Subs.Where(x => !expired.Any(y => y.TopicID == x.TopicID)).ToList();
-            return (expired, running);
+            throw new NotImplementedException();
         }
 
-        LeaseSub ITopicDataService.GetLeaseSub(ulong id)
-            => TopicRepository.Leases.Subs.Single(x => x.TopicID == id);
-
-        List<DataSub> ITopicDataService.GetSubbedTopics()
+        public string GetCallback(ulong id)
         {
-            return TopicRepository.Data.Subs.Where(x =>
-            {
-                var lease = TopicRepository.Leases.Subs.Single(y => y.TopicID == x.TopicID);
-                return lease.Subscribed;
-            }).ToList();
+            throw new NotImplementedException();
         }
 
-        void ITopicDataService.UpdateLease(ulong id, bool subscribe, int leaseTime)
+        public DataSub GetDataSub(ulong id)
         {
-            var lease = TopicRepository.Leases.Subs.Single(x => x.TopicID == id);
-            lease.LeaseTime = leaseTime;
-            lease.LastLease = leaseTime == 0 ? DateTime.MinValue : DateTime.Now;
-            lease.Subscribed = subscribe;
-            TopicRepository.Save(FileNames.leases);
+            throw new NotImplementedException();
         }
 
-        bool ITopicDataService.UpdateTopic(DataSub dataSub, LeaseSub leaseSub)
+        public (List<DataSub>, List<LeaseSub>) GetExpiredAndRunningSubs()
         {
-            var oldDataSub = ((ITopicDataService)this).GetDataSub(dataSub.TopicID);
-            var oldLeaseSub = ((ITopicDataService)this).GetLeaseSub(dataSub.TopicID);
-
-            var dataIndex = TopicRepository.Data.Subs.IndexOf(oldDataSub);
-            var leaseIndex = TopicRepository.Leases.Subs.IndexOf(oldLeaseSub);
-
-            TopicRepository.Data.Subs[dataIndex] = dataSub;
-            TopicRepository.Leases.Subs[leaseIndex] = leaseSub;
-
-            try
-            {
-                TopicRepository.Save(FileNames.data);
-                TopicRepository.Save(FileNames.leases);
-            }
-            catch (Exception)
-            {
-                TopicRepository.Data.Subs[dataIndex] = oldDataSub;
-                TopicRepository.Leases.Subs[leaseIndex] = oldLeaseSub;
-                return false;
-            }
-            return true;
+            throw new NotImplementedException();
         }
 
-        bool ITopicDataService.VerifyAdminToken(string token)
-            => TopicRepository.Data.AdminToken == token;
+        public LeaseSub GetLeaseSub(ulong id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<DataSub> GetSubbedTopics()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void UpdateLease(ulong id, bool subscribe, int leaseTime = 0)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool UpdateTopic(DataSub dataSub, LeaseSub leaseSub)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool VerifyAdminToken(string token)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

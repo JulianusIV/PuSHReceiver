@@ -4,8 +4,7 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using PubSubHubBubReciever.Controllers;
-using System;
+using Services;
 
 namespace PubSubHubBubReciever
 {
@@ -50,13 +49,13 @@ namespace PubSubHubBubReciever
         private void OnAppStarted()
         {
 #if !DEBUG
-            //subscriptionService.SubscribeAll();
+            Runtime.Instance.ServiceLoader.ResolveService<ISubscriptionService>().SubscribeAll();
 #endif
         }
 
         private void OnAppStopping()
         {
-            //unsubAll
+            Runtime.Instance.ServiceLoader.ResolveService<ISubscriptionService>().UnsubscribeAll();
 
             //Console.WriteLine("Getting cancellation Token and waiting for cancellation or 3 min.");
             //var cancellationToken = FeedRecieverController.tokenSource.Token;

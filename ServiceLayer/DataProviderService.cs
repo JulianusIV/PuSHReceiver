@@ -7,10 +7,17 @@ namespace ServiceLayer
 {
     public class DataProviderService : IDataProviderService
     {
-        public Data.JSONObjects.Data? Data { get; set; }
+        public Data.JSONObjects.Data Data { get; set; }
+
+        public DataProviderService()
+        {
+            Load();
+            if (Data is null)
+                Data = new();
+        }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public void Load()
+        private void Load()
         {
             bool exit = false;
             if (File.Exists("data.json"))

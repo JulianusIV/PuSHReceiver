@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PubSubHubBubReciever\PubSubHubBubReciever.csproj" />
     <ProjectReference Include="..\Services\Services.csproj" />
   </ItemGroup>
 

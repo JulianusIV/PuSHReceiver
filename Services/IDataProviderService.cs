@@ -1,12 +1,10 @@
-﻿using System.Runtime.CompilerServices;
+﻿using Services.Interfaces;
 
 namespace Services
 {
-    public interface IDataProviderService
+    public interface IDataProviderService : IService
     {
-        public Data.JSONObjects.Data? Data { get; set; }
-
-        public void Load();
+        public Data.JSONObjects.Data Data { get; set; }
 
         public void Save();
     }

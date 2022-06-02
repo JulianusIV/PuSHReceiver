@@ -1,6 +1,7 @@
 ﻿using Services.Exceptions;
 using Services.Interfaces;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace Services
 {
@@ -51,6 +52,7 @@ namespace Services
                 });
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public T ResolveService<T>() where T : IService
         {
             T? retVal = (T?)_services.SingleOrDefault(x => x.GetType().IsAssignableTo(typeof(T)));

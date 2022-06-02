@@ -5,7 +5,7 @@ namespace ServiceLayer
 {
     public class TopicDataService : ITopicDataService
     {
-        public bool AddTopic(DataSub dataSub, LeaseSub leaseSub)
+        public bool AddTopic(DataSub dataSub)
         {
             throw new NotImplementedException();
         }
@@ -15,7 +15,7 @@ namespace ServiceLayer
             throw new NotImplementedException();
         }
 
-        public bool DeleteTopic(DataSub dataSub, LeaseSub leaseSub)
+        public bool DeleteTopic(DataSub dataSub)
         {
             throw new NotImplementedException();
         }
@@ -30,12 +30,7 @@ namespace ServiceLayer
             throw new NotImplementedException();
         }
 
-        public (List<DataSub>, List<LeaseSub>) GetExpiredAndRunningSubs()
-        {
-            throw new NotImplementedException();
-        }
-
-        public LeaseSub GetLeaseSub(ulong id)
+        public List<DataSub> GetExpiredAndRunningSubs()
         {
             throw new NotImplementedException();
         }
@@ -50,7 +45,7 @@ namespace ServiceLayer
             throw new NotImplementedException();
         }
 
-        public bool UpdateTopic(DataSub dataSub, LeaseSub leaseSub)
+        public bool UpdateTopic(DataSub dataSub)
         {
             throw new NotImplementedException();
         }

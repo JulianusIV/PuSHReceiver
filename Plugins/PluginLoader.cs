@@ -40,6 +40,7 @@ namespace Plugins
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine($"Failed to create instance of plugin {type.Name}!");
+                    Console.ForegroundColor = ConsoleColor.Gray;
                     continue;
                 }
                 if (plugins.Any(x => x.Name == plugin.Name))

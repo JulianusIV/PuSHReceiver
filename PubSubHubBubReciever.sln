@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceLayer", "ServiceLaye
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Data", "Data\Data.csproj", "{A25DDE5F-79DF-46A6-A481-7A7A483EEF1C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugins", "Plugins\Plugins.csproj", "{E2EC345F-252F-4B57-8C44-5BC5BB87743E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugins", "Plugins\Plugins.csproj", "{E2EC345F-252F-4B57-8C44-5BC5BB87743E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

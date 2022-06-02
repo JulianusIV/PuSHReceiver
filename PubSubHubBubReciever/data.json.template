@@ -2,11 +2,16 @@
 	"AdminToken":"ExampleToken",
 	"CallbackURL":"https://mydomain.example.com/FeedSubscriber", 
 	"Subs":[
-		{
-			"TopicID": 0,
-			"TopicURL": "https://www.youtube.com/xml/feeds/videos.xml?channel_id=my_channel_id",
-			"Token": "my_token",
-			"Secret": "my_secret"
-		}
+    {
+      "TopicID": 0,
+      "TopicURL": "https://www.youtube.com/xml/feeds/videos.xml?channel_id=my_channel_id",
+      "LastLease": "0001-01-01T00:00:00",
+      "LeaseTime": 0,
+      "Subscribed": false,
+      "FeedConsumer": null,
+      "FeedPublisher": null,
+      "ConsumerData": null,
+      "PublisherData": null
+    }
 	]
 }

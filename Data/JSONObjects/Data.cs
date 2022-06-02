@@ -12,8 +12,9 @@
     {
         public ulong TopicID { get; set; }
         public string TopicURL { get; set; }
-        public string Token { get; set; }
-        public string Secret { get; set; }
+        public DateTime LastLease { get; set; }
+        public int LeaseTime { get; set; }
+        public bool Subscribed { get; set; }
         public string FeedPublisher { get; set; }
         public string FeedParser { get; set; }
         public string PublisherData { get; set; }

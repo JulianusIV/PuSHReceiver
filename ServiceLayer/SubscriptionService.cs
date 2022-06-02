@@ -1,23 +1,32 @@
-﻿using Data.JSONObjects;
+﻿using Plugins.Interfaces;
+using PubSubHubBubReciever;
 using Services;
 
 namespace ServiceLayer
 {
     public class SubscriptionService : ISubscriptionService
     {
-        public void SubscribeAll()
+        public async void SubscribeAll()
         {
-            throw new NotImplementedException();
+            var service = Runtime.Instance.ServiceLoader.ResolveService<ITopicDataService>();
+
+            foreach (var sub in service.GetExpiredSubs())
+                await Runtime.Instance.PluginLoader.ResolvePlugin<IConsumerPlugin>(sub.FeedConsumer)
+                    .SubscribeAsync(sub);
+
+            foreach (var sub in service.GetRunningSubs())
+                Runtime.Instance.ServiceLoader.ResolveService<ILeaseService>()
+                    .RegisterLease(sub,
+                    (int)(sub.LastLease + TimeSpan.FromSeconds(sub.LeaseTime) - DateTime.Now).TotalSeconds);
         }
 
-        public Task<bool> SubscribeAsync(DataSub dataSub, bool subscribe = true)
+        public async void UnsubscribeAll()
         {
-            throw new NotImplementedException();
-        }
+            var service = Runtime.Instance.ServiceLoader.ResolveService<ITopicDataService>();
 
-        public void UnsubscribeAll()
-        {
-            throw new NotImplementedException();
+            foreach (var sub in service.GetSubbedTopics())
+                await Runtime.Instance.PluginLoader.ResolvePlugin<IConsumerPlugin>(sub.FeedConsumer)
+                    .SubscribeAsync(sub, false);
         }
     }
 }

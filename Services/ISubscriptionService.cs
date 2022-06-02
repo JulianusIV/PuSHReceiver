@@ -7,6 +7,5 @@ namespace Services
     {
         void SubscribeAll();
         void UnsubscribeAll();
-        Task<bool> SubscribeAsync(DataSub dataSub, bool subscribe = true);
     }
 }

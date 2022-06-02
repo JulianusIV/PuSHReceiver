@@ -1,4 +1,4 @@
-﻿namespace Services.Service.Interfaces
+﻿namespace Services.Interfaces
 {
     public interface IService
     {

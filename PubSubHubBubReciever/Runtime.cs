@@ -1,5 +1,5 @@
-﻿using PubSubHubBubReciever.Plugin;
-using Services.Service;
+﻿using Plugins;
+using Services;
 
 namespace PubSubHubBubReciever
 {

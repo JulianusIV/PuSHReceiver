@@ -1,4 +1,4 @@
-﻿namespace Services.Service.Exceptions
+﻿namespace Services.Exceptions
 {
     public class ServiceNotFoundException : Exception
     {

@@ -1,8 +1,8 @@
-﻿using Services.Service.Exceptions;
-using Services.Service.Interfaces;
+﻿using Services.Exceptions;
+using Services.Interfaces;
 using System.Reflection;
 
-namespace Services.Service
+namespace Services
 {
     public class ServiceLoader
     {

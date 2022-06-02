@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Plugins\Plugins.csproj" />
     <ProjectReference Include="..\Services\Services.csproj" />
   </ItemGroup>
 

@@ -1,4 +1,4 @@
-﻿namespace PubSubHubBubReciever.Plugin.Interfaces
+﻿namespace Plugins.Interfaces
 {
     public interface IPublisherPlugin : IBasePlugin
     {

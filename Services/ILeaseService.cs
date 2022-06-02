@@ -1,5 +1,5 @@
 ﻿using Data.JSONObjects;
-using Services.Service.Interfaces;
+using Services.Interfaces;
 
 namespace Services
 {

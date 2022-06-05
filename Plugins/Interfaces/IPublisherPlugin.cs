@@ -2,5 +2,6 @@
 {
     public interface IPublisherPlugin : IBasePlugin
     {
+        void Init();
     }
 }

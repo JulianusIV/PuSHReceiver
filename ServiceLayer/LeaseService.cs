@@ -9,12 +9,13 @@ namespace ServiceLayer
 {
     public class LeaseService : ILeaseService
     {
-        private static Dictionary<ulong, Timer> _leaseTimers { get; } = new();
+        private static Dictionary<ulong, Timer> LeaseTimers { get; } = new();
 
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void RegisterLease(DataSub dataSub, int leaseTime)
         {
-            Console.WriteLine($"Scheduling lease renewal for topic {dataSub.TopicID} in {leaseTime} seconds ({TimeSpan.FromSeconds(leaseTime).TotalDays} days)");
+            Console.WriteLine($"Scheduling lease renewal for topic {dataSub.TopicID} in {leaseTime} seconds " +
+                $"({TimeSpan.FromSeconds(leaseTime).TotalDays} days)");
 
             var timer = GetTimer(dataSub);
             timer.Stop();
@@ -25,14 +26,14 @@ namespace ServiceLayer
 
         private Timer GetTimer(DataSub dataSub)
         {
-            if (_leaseTimers.ContainsKey(dataSub.TopicID))
-                return _leaseTimers[dataSub.TopicID];
+            if (LeaseTimers.ContainsKey(dataSub.TopicID))
+                return LeaseTimers[dataSub.TopicID];
 
             var timer = new Timer();
             timer.Elapsed += async (sender, e)
                 => await Runtime.Instance.PluginLoader.ResolvePlugin<IConsumerPlugin>(dataSub.FeedConsumer)
                     .SubscribeAsync(dataSub);
-            _leaseTimers.Add(dataSub.TopicID, timer);
+            LeaseTimers.Add(dataSub.TopicID, timer);
             return timer;
         }
     }

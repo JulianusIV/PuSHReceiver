@@ -19,6 +19,9 @@ namespace Plugins
 
             _consumerPlugins = GetPlugins<IConsumerPlugin>();
             _publisherPlugins = GetPlugins<IPublisherPlugin>();
+
+            _consumerPlugins.ForEach(x => Task.Run(() => x.Init()));
+            _publisherPlugins.ForEach(x => Task.Run(() => x.Init()));
         }
 
         private List<T> GetPlugins<T>(List<T>? plugins = null) where T : IBasePlugin

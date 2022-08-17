@@ -9,7 +9,7 @@ namespace PubSubHubBubReciever
         public static Task Publish(this DataSub dataSub, string user, string itemUrl, params string[] args)
         {
             var plugin = Runtime.Instance.PluginLoader.ResolvePlugin<IPublisherPlugin>(dataSub.FeedPublisher);
-            plugin.Publish(dataSub, user, itemUrl, args);
+            plugin.PublishAsync(dataSub, user, itemUrl, args);
             return Task.CompletedTask;
         }
     }

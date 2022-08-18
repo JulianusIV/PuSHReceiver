@@ -11,4 +11,8 @@
     <ProjectReference Include="..\PubSubHubBubReciever\PubSubHubBubReciever.csproj" />
   </ItemGroup>
 
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy /Y $(TargetPath) $(SolutionDir)\PubSubHubBubReciever\bin\Debug\net6.0" />
+  </Target>
+
 </Project>

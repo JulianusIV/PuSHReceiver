@@ -45,7 +45,7 @@ namespace DefaultPlugins.DiscordPublisher
             await client.PostAsync(pluginData.WebhookURL, new StringContent(content, Encoding.UTF8, "application/json"));
         }
 
-        public string? AddSubscription(params string[] additionalInfo)
+        public string? AddSubscription(ulong id, params string[] additionalInfo)
         {
             var ret = new PluginData();
 
@@ -55,7 +55,7 @@ namespace DefaultPlugins.DiscordPublisher
 
                 if (item.StartsWith(Name))
                 {
-                    var property = item[..item.IndexOf('=')].Replace("DiscordWebhookPublisher", "");
+                    var property = item[..item.IndexOf('=')].Replace(Name, "");
                     var value = item[(item.IndexOf('=') + 1)..];
 
                     props.FirstOrDefault(x => x.Name == property)?.SetValue(ret, value);
@@ -64,7 +64,7 @@ namespace DefaultPlugins.DiscordPublisher
             return JsonSerializer.Serialize(ret);
         }
 
-        public string? UpdateSubscription(string oldData, params string[] additionalInfo)
+        public string? UpdateSubscription(ulong id, string oldData, params string[] additionalInfo)
         {
             var oldDataObj = JsonSerializer.Deserialize<PluginData>(oldData);
 
@@ -76,7 +76,7 @@ namespace DefaultPlugins.DiscordPublisher
 
                 if (item.StartsWith(Name))
                 {
-                    var property = item[..item.IndexOf('=')].Replace("DiscordWebhookPublisher", "");
+                    var property = item[..item.IndexOf('=')].Replace(Name, "");
                     var value = item[(item.IndexOf('=') + 1)..];
 
                     props.FirstOrDefault(x => x.Name == property)?.SetValue(ret, value);

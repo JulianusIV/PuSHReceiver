@@ -11,7 +11,8 @@
   "profiles": {
     "IIS Express": {
       "commandName": "IISExpress",
-      "launchUrl": "weatherforecast",
+      "launchUrl": "swagger",
+      "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "LOADDEFAULTPLUGINS": "True"
@@ -19,7 +20,8 @@
     },
     "PubSubHubBubReciever": {
       "commandName": "Project",
-      "launchUrl": "weatherforecast",
+      "launchUrl": "swagger",
+      "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "LOADDEFAULTPLUGINS": "True"
@@ -28,7 +30,8 @@
     },
     "Docker": {
       "commandName": "Docker",
-      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/weatherforecast",
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
+      "launchBrowser": true,
       "environmentVariables": {
         "LOADDEFAULTPLUGINS": "True"
       },

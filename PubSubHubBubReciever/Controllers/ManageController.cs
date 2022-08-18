@@ -4,6 +4,8 @@ using Plugins.Interfaces;
 using Services;
 using System;
 using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace PubSubHubBubReciever.Controllers
@@ -37,7 +39,7 @@ namespace PubSubHubBubReciever.Controllers
 
             using var sr = new StreamReader(Request.Body);
             var bodyString = await sr.ReadToEndAsync();
-            var infos = bodyString.Split(Environment.NewLine);
+            var infos = Regex.Split(bodyString, @"(\r\n|\r|\n)").Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
 
             var consumer = Runtime.Instance.PluginLoader.ResolvePlugin<IConsumerPlugin>(consumerName);
 

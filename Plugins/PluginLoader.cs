@@ -11,11 +11,21 @@ namespace Plugins
 
         public PluginLoader()
         {
-            LoadDlls("Plugins");
+#if DEBUG
+            LoadDlls(@"bin\Debug\net6.0\Plugins");
+#else
+            LoadDlls(@"Plugins"); 
+#endif
             var envVar = Environment.GetEnvironmentVariable("LOADDEFAULTPLUGINS");
             bool loadDefault = envVar is null || bool.Parse(envVar);
             if (loadDefault)
-                LoadDlls(".");
+            {
+#if DEBUG
+                LoadDlls(@"bin\Debug\net6.0\");
+#else
+                LoadDlls("."); 
+#endif
+            }
 
             _consumerPlugins = GetPlugins<IConsumerPlugin>();
             _publisherPlugins = GetPlugins<IPublisherPlugin>();

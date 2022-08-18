@@ -16,6 +16,7 @@ namespace DefaultPlugins.YouTubeConsumer
     {
         public string Name => "Default_YouTubeConsumer";
 
+
         public void Init()
         {
             FeedRecieverController.OnGet += OnGetHandler;
@@ -32,7 +33,7 @@ namespace DefaultPlugins.YouTubeConsumer
             using var client = new HttpClient();
             using var request = new HttpRequestMessage();
 
-            request.RequestUri = new("https://pubsubhubbub.appspot.com/subscribe");
+            request.RequestUri = new(dataSub.HubURL);
             request.Method = HttpMethod.Post;
 
             var formList = new Dictionary<string, string>()
@@ -56,6 +57,30 @@ namespace DefaultPlugins.YouTubeConsumer
             }
             return result;
         }
+
+        public string? AddSubscription(ulong id, params string[] _)
+        {
+            var idBytes = BitConverter.GetBytes(id);
+            var token = BitConverter.ToString(SHA256.Create().ComputeHash(idBytes)).Replace("-", "").ToLower();
+
+            var tokenBytes = Encoding.UTF8.GetBytes(token);
+
+            var secretBytes = idBytes.ToList();
+            secretBytes.AddRange(tokenBytes);
+
+            var secret = BitConverter.ToString(SHA256.Create().ComputeHash(secretBytes.ToArray())).Replace("-", "").ToLower();
+
+            var ret = new PluginData()
+            {
+                Token = token,
+                Secret = secret
+            };
+            return JsonSerializer.Serialize(ret);
+        }
+
+        public string? UpdateSubscription(ulong id, string oldData, params string[] additionalInfo)
+            => oldData;
+
         private Response OnGetHandler(HttpRequest request, ulong topicId)
         {
             Response response = new()
@@ -171,17 +196,17 @@ namespace DefaultPlugins.YouTubeConsumer
             var hashString = BitConverter.ToString(hash).Replace("-", "").ToLower();
 
             if (headerHash != hashString)
-                {
+            {
                 response.RetCode = HttpStatusCode.Unauthorized;
                 return response;
             }
 
-            XmlSerializer serializer = new XmlSerializer(typeof(feed));
+            XmlSerializer serializer = new(typeof(feed));
             using StringReader stringReader = new(bodyString);
             feed? xml = (feed?)serializer.Deserialize(stringReader);
 
             if (xml is null)
-                {
+            {
                 response.RetCode = HttpStatusCode.InternalServerError;
                 return response;
             }

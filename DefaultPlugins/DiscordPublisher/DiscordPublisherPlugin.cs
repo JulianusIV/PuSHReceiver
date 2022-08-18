@@ -44,5 +44,50 @@ namespace DefaultPlugins.DiscordPublisher
             using var client = new HttpClient();
             await client.PostAsync(pluginData.WebhookURL, new StringContent(content, Encoding.UTF8, "application/json"));
         }
+
+        public string? AddSubscription(params string[] additionalInfo)
+        {
+            var ret = new PluginData();
+
+            foreach (var item in additionalInfo)
+            {
+                var props = ret.GetType().GetProperties();
+
+                if (item.StartsWith(Name))
+                {
+                    var property = item[..item.IndexOf('=')].Replace("DiscordWebhookPublisher", "");
+                    var value = item[(item.IndexOf('=') + 1)..];
+
+                    props.FirstOrDefault(x => x.Name == property)?.SetValue(ret, value);
+                }
+            }
+            return JsonSerializer.Serialize(ret);
+        }
+
+        public string? UpdateSubscription(string oldData, params string[] additionalInfo)
+        {
+            var oldDataObj = JsonSerializer.Deserialize<PluginData>(oldData);
+
+            var ret = new PluginData();
+
+            var props = ret.GetType().GetProperties();
+            foreach (var item in additionalInfo)
+            {
+
+                if (item.StartsWith(Name))
+                {
+                    var property = item[..item.IndexOf('=')].Replace("DiscordWebhookPublisher", "");
+                    var value = item[(item.IndexOf('=') + 1)..];
+
+                    props.FirstOrDefault(x => x.Name == property)?.SetValue(ret, value);
+                }
+            }
+
+            foreach (var prop in props)
+                if (prop.GetValue(ret) is null)
+                    prop.SetValue(ret, prop.GetValue(oldDataObj));
+
+            return JsonSerializer.Serialize(ret);
+        }
     }
 }

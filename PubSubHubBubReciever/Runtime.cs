@@ -1,5 +1,6 @@
 ﻿using Plugins;
 using Services;
+using System.Threading;
 
 namespace PubSubHubBubReciever
 {
@@ -28,6 +29,10 @@ namespace PubSubHubBubReciever
             _pluginLoader = new();
             _serviceLoader = new();
         }
+        #endregion
+
+        #region Properties
+        public CancellationTokenSource TokenSource = new CancellationTokenSource(); 
         #endregion
 
         #region Plugin

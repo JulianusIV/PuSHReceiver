@@ -1,4 +1,5 @@
 ﻿using Data.JSONObjects;
+using PubSubHubBubReciever;
 using Services;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
@@ -49,6 +50,18 @@ namespace ServiceLayer
 
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void Save()
-            => File.WriteAllText("data.json", JsonSerializer.Serialize(Data, new JsonSerializerOptions() { WriteIndented = true }));
+        {
+            File.WriteAllText("data.json", JsonSerializer.Serialize(Data, new JsonSerializerOptions() { WriteIndented = true }));
+
+            _ = Task.Run(() => 
+            {
+                if (Data.Subs.Any(x => x.Subscribed))
+                    return;
+
+                Thread.Sleep(500);
+
+                Runtime.Instance.TokenSource.Cancel();
+            });
+        }
     }
 }

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Services;
+using System;
 
 namespace PubSubHubBubReciever
 {
@@ -57,12 +58,12 @@ namespace PubSubHubBubReciever
         {
             Runtime.Instance.ServiceLoader.ResolveService<ISubscriptionService>().UnsubscribeAll();
 
-            //Console.WriteLine("Getting cancellation Token and waiting for cancellation or 3 min.");
-            //var cancellationToken = FeedRecieverController.tokenSource.Token;
-            //cancellationToken.WaitHandle.WaitOne(TimeSpan.FromMinutes(3));
-            //Console.WriteLine(cancellationToken.IsCancellationRequested ?
-            //    "Timeout cancelled, unsubscribe successful, continuing graceful shutdown." :
-            //    "Timeout, shutting down w/o or with partial unsubscribe.");
+            Console.WriteLine("Getting cancellation Token and waiting for cancellation or 3 min.");
+            var cancellationToken = Runtime.Instance.TokenSource.Token;
+            cancellationToken.WaitHandle.WaitOne(TimeSpan.FromMinutes(3));
+            Console.WriteLine(cancellationToken.IsCancellationRequested ?
+                "Timeout cancelled, unsubscribe successful, continuing graceful shutdown." :
+                "Timeout, shutting down w/o or with partial unsubscribe.");
         }
     }
 }

@@ -21,17 +21,17 @@ namespace PubSubHubBubReciever.Controllers
         {
             var ret = OnGet.Invoke(Request, topicId);
             
-            if (!ret.Challenge)
+            if (!ret.Challenge && ret.IsSuccessStatusCode)
                 ret.Item.Publish(ret.User, ret.ItemUrl, ret.Args);
 
             ContentResult result = null;
             if (ret.ReponseBody is not null)
             {
                 result = Content(ret.ReponseBody);
-                result.StatusCode = ret.RetCode;
+                result.StatusCode = (int)ret.RetCode;
             }
 
-            return result is null ? StatusCode(ret.RetCode) : result;
+            return result is null ? StatusCode((int)ret.RetCode) : result;
         }
 
         [HttpPost]
@@ -41,17 +41,17 @@ namespace PubSubHubBubReciever.Controllers
         {
             var ret = OnPost.Invoke(Request, topicId);
 
-            if (!ret.Challenge)
+            if (!ret.Challenge && ret.IsSuccessStatusCode)
                 ret.Item.Publish(ret.User, ret.ItemUrl, ret.Args);
 
             ContentResult result = null;
             if (ret.ReponseBody is not null)
             {
                 result = Content(ret.ReponseBody);
-                result.StatusCode = ret.RetCode;
+                result.StatusCode = (int)ret.RetCode;
             }
 
-            return result is null ? StatusCode(ret.RetCode) : result;
+            return result is null ? StatusCode((int)ret.RetCode) : result;
         }
     }
 }

@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Plugins\Plugins.csproj" />
-    <ProjectReference Include="..\PubSubHubBubReciever\PubSubHubBubReciever.csproj" />
   </ItemGroup>
 
 </Project>

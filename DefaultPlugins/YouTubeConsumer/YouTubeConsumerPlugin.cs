@@ -1,7 +1,6 @@
 ﻿using Data.JSONObjects;
-using Microsoft.AspNetCore.Http;
+using Plugins;
 using Plugins.Interfaces;
-using PubSubHubBubReciever;
 using PubSubHubBubReciever.Controllers;
 using Services;
 using System.Net;
@@ -16,11 +15,21 @@ namespace DefaultPlugins.YouTubeConsumer
     {
         public string Name => "Default_YouTubeConsumer";
 
+        public string BaseCalllbackUrl { get; set; }
+        public IDataProviderService DataProviderService { get; set; }
+        public ILeaseService LeaseService { get; set; }
+
+        public YouTubeConsumerPlugin(string baseCallbackUrl, IDataProviderService dataProviderService, ILeaseService leaseService)
+        {
+            BaseCalllbackUrl = baseCallbackUrl;
+            DataProviderService = dataProviderService;
+            LeaseService = leaseService;
+        }
 
         public Task InitAsync()
         {
-            FeedRecieverController.OnGet += OnGetHandler;
-            FeedRecieverController.OnPost += OnPostHandler;
+            ApiMethodSource.OnGet += OnGetHandler;
+            ApiMethodSource.OnPost += OnPostHandler;
 
             return Task.CompletedTask;
         }
@@ -42,7 +51,7 @@ namespace DefaultPlugins.YouTubeConsumer
             {
                 { "hub.mode", subscribe ? "subscribe" : "unsubscribe" },
                 { "hub.topic", dataSub.TopicURL },
-                { "hub.callback", Runtime.Instance.ServiceLoader.ResolveService<IDataProviderService>().Data.CallbackURL + $"/{dataSub.TopicID}" },
+                { "hub.callback", BaseCalllbackUrl + $"/{dataSub.TopicID}" },
                 { "hub.verify", "sync" },
                 { "hub.secret", data.Secret },
                 { "hub.verify_token", data.Token }
@@ -83,16 +92,14 @@ namespace DefaultPlugins.YouTubeConsumer
         public string? UpdateSubscription(ulong id, string oldData, params string[] additionalInfo)
             => oldData;
 
-        private Response OnGetHandler(HttpRequest request, ulong topicId)
+        private Response OnGetHandler(Request request, ulong topicId)
         {
             Response response = new()
             {
                 Challenge = true
             };
 
-            var service = Runtime.Instance.ServiceLoader.ResolveService<IDataProviderService>();
-
-            var dataSub = service.Data.Subs.Find(x => x.TopicID == topicId);
+            var dataSub = DataProviderService.Data.Subs.Find(x => x.TopicID == topicId);
             if (dataSub is null)
             {
                 response.RetCode = HttpStatusCode.NotFound;
@@ -106,41 +113,40 @@ namespace DefaultPlugins.YouTubeConsumer
                 return response;
             }
 
-            if (request.Query["hub.verify_token"] != data.Token)
+            if (request.QueryParameters["hub.verify_token"] != data.Token)
             {
                 response.RetCode = HttpStatusCode.Unauthorized;
                 return response;
             }
 
-            if (request.Query["hub.topic"] != dataSub.TopicURL)
+            if (request.QueryParameters["hub.topic"] != dataSub.TopicURL)
             {
                 response.RetCode = HttpStatusCode.NotFound;
                 return response;
             }
 
-            if (request.Query["hub.mode"] == "subscribe")
+            if (request.QueryParameters["hub.mode"] == "subscribe")
             {
-                int leaseTime = int.Parse(request.Query["hub.lease_seconds"]);
+                int leaseTime = int.Parse(request.QueryParameters["hub.lease_seconds"]);
                 dataSub.LeaseTime = leaseTime;
                 dataSub.LastLease = DateTime.Now;
                 dataSub.Subscribed = true;
-                service.Save();
+                DataProviderService.Save();
 
-                var leaseService = Runtime.Instance.ServiceLoader.ResolveService<ILeaseService>();
-                leaseService.RegisterLease(dataSub, leaseTime);
+                LeaseService.RegisterLease(dataSub, leaseTime);
 
-                response.ReponseBody = request.Query["hub.challenge"];
+                response.ReponseBody = request.QueryParameters["hub.challenge"];
                 response.RetCode = HttpStatusCode.OK;
                 return response;
             }
-            else if (request.Query["hub.mode"] == "unsubscribe")
+            else if (request.QueryParameters["hub.mode"] == "unsubscribe")
             {
                 dataSub.LeaseTime = 0;
                 dataSub.LastLease = DateTime.MinValue;
                 dataSub.Subscribed = false;
-                service.Save();
+                DataProviderService.Save();
 
-                response.ReponseBody = request.Query["hub.challenge"];
+                response.ReponseBody = request.QueryParameters["hub.challenge"];
                 response.RetCode = HttpStatusCode.OK;
                 return response;
             }
@@ -149,16 +155,14 @@ namespace DefaultPlugins.YouTubeConsumer
             return response;
         }
 
-        private Response OnPostHandler(HttpRequest request, ulong topicId)
+        private Response OnPostHandler(Request request, ulong topicId)
         {
             Response response = new()
             {
                 Challenge = false
             };
 
-            var service = Runtime.Instance.ServiceLoader.ResolveService<IDataProviderService>();
-
-            var dataSub = service.Data.Subs.Find(x => x.TopicID == topicId);
+            var dataSub = DataProviderService.Data.Subs.Find(x => x.TopicID == topicId);
             if (dataSub is null)
             {
                 response.RetCode = HttpStatusCode.NotFound;
@@ -180,9 +184,7 @@ namespace DefaultPlugins.YouTubeConsumer
 
             var headerHash = request.Headers["X-Hub-Signature"].ToString().Replace("sha1=", "");
 
-            using var sr = new StreamReader(request.Body);
-            var bodyString = sr.ReadToEnd();
-            byte[] bytes = Encoding.UTF8.GetBytes(bodyString);
+            byte[] bytes = Encoding.UTF8.GetBytes(request.Body);
 
             var hmac = HMAC.Create("HMACSHA1");
             string secret = data.Secret;
@@ -204,7 +206,7 @@ namespace DefaultPlugins.YouTubeConsumer
             }
 
             XmlSerializer serializer = new(typeof(feed));
-            using StringReader stringReader = new(bodyString);
+            using StringReader stringReader = new(request.Body);
             feed? xml = (feed?)serializer.Deserialize(stringReader);
 
             if (xml is null)

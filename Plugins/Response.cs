@@ -5,6 +5,7 @@ namespace PubSubHubBubReciever.Controllers
 {
     public class Response
     {
+#nullable disable
         public bool Challenge { get; set; }
         public HttpStatusCode RetCode { get; set; }
         public string ReponseBody { get; set; }
@@ -13,5 +14,6 @@ namespace PubSubHubBubReciever.Controllers
         public string ItemUrl { get; set; }
         public string[] Args { get; set; }
         public bool IsSuccessStatusCode => ((int)RetCode >= 200) && ((int)RetCode <= 299);
+#nullable enable
     }
 }

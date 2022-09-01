@@ -1,5 +1,6 @@
 ﻿using Plugins.Exceptions;
 using Plugins.Interfaces;
+using Services;
 using System.Reflection;
 
 namespace Plugins
@@ -8,9 +9,15 @@ namespace Plugins
     {
         private readonly List<IConsumerPlugin> _consumerPlugins = new();
         private readonly List<IPublisherPlugin> _publisherPlugins = new();
+        public string BaseCalllbackUrl { get; set; }
+        public IDataProviderService DataProviderService { get; set; }
+        public ILeaseService LeaseService { get; set; }
 
-        public PluginLoader()
+        public PluginLoader(string baseCallbackUrl, IDataProviderService dataProviderService, ILeaseService leaseService)
         {
+            BaseCalllbackUrl = baseCallbackUrl;
+            DataProviderService = dataProviderService;
+            LeaseService = leaseService;
 #if DEBUG
             LoadDlls(@"bin\Debug\net6.0\Plugins");
 #else
@@ -47,7 +54,10 @@ namespace Plugins
 
             foreach (var type in types)
             {
-                T? plugin = (T?)Activator.CreateInstance(type);
+                T? plugin = pluginType == typeof(IConsumerPlugin) ? 
+                    (T?)Activator.CreateInstance(type, BaseCalllbackUrl, DataProviderService, LeaseService) : 
+                    (T?)Activator.CreateInstance(type);
+
                 if (plugin is null)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;

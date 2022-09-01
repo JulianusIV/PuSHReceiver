@@ -15,8 +15,7 @@ namespace PubSubHubBubReciever
             {
                 lock (_lock)
                 {
-                    if (_instance is null)
-                        _instance = new();
+                    _instance ??= new();
                     return _instance;
                 }
             }
@@ -26,8 +25,11 @@ namespace PubSubHubBubReciever
         #region Construction/Destruction
         private Runtime()
         {
-            _pluginLoader = new();
+            var dataProvider = ServiceLoader.ResolveService<IDataProviderService>();
+            var lease = ServiceLoader.ResolveService<ILeaseService>();
+            var url = dataProvider.Data.CallbackURL;
             _serviceLoader = new();
+            _pluginLoader = new(url, dataProvider, lease);
         }
         #endregion
 
@@ -41,7 +43,12 @@ namespace PubSubHubBubReciever
             get
             {
                 if (_pluginLoader is null)
-                    _pluginLoader = new();
+                {
+                    var dataProvider = ServiceLoader.ResolveService<IDataProviderService>();
+                    var lease = ServiceLoader.ResolveService<ILeaseService>();
+                    var url = dataProvider.Data.CallbackURL;
+                    _pluginLoader = new(url, dataProvider, lease);
+                }
                 return _pluginLoader;
             }
         }
@@ -54,8 +61,7 @@ namespace PubSubHubBubReciever
         {
             get
             {
-                if (_serviceLoader is null)
-                    _serviceLoader = new();
+                _serviceLoader ??= new();
                 return _serviceLoader;
             }
         }

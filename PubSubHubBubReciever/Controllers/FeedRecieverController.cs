@@ -1,6 +1,6 @@
-﻿using Data.JSONObjects;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Plugins;
+using System.IO;
 
 namespace PubSubHubBubReciever.Controllers
 {
@@ -8,19 +8,21 @@ namespace PubSubHubBubReciever.Controllers
     [Route("[controller]")]
     public class FeedRecieverController : ControllerBase
     {
-        #region Events
-        public delegate Response OnGetRequestHandler(HttpRequest request, ulong topicId);
-        public delegate Response OnPostRequestHandler(HttpRequest request, ulong topicId);
-        public static event OnGetRequestHandler OnGet;
-        public static event OnPostRequestHandler OnPost;
-        #endregion
-
         [HttpGet]
         [Route("{topicId}")]
         public IActionResult Get([FromRoute] ulong topicId)
         {
-            var ret = OnGet.Invoke(Request, topicId);
-            
+            var request = new Request();
+
+            using var sr = new StreamReader(request.Body);
+            foreach (var param in Request.Query)
+                request.QueryParameters.Add(param.Key, param.Value);
+            foreach (var header in Request.Headers)
+                request.Headers.Add(header.Key, header.Value);
+            request.Body = sr.ReadToEnd();
+
+            var ret = ApiMethodSource.InvokeGet(request, topicId);
+
             if (!ret.Challenge && ret.IsSuccessStatusCode)
                 ret.Item.Publish(ret.User, ret.ItemUrl, ret.Args);
 
@@ -39,7 +41,16 @@ namespace PubSubHubBubReciever.Controllers
         [Consumes("application/xml")]
         public IActionResult Post([FromRoute] ulong topicId)
         {
-            var ret = OnPost.Invoke(Request, topicId);
+            var request = new Request();
+
+            using var sr = new StreamReader(request.Body);
+            foreach (var param in Request.Query)
+                request.QueryParameters.Add(param.Key, param.Value);
+            foreach (var header in Request.Headers)
+                request.Headers.Add(header.Key, header.Value);
+            request.Body = sr.ReadToEnd();
+
+            var ret = ApiMethodSource.InvokePost(request, topicId);
 
             if (!ret.Challenge && ret.IsSuccessStatusCode)
                 ret.Item.Publish(ret.User, ret.ItemUrl, ret.Args);

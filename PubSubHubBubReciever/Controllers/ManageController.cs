@@ -1,12 +1,11 @@
-﻿using DataLayer.JSONObject;
+﻿using Data.JSONObjects;
 using Microsoft.AspNetCore.Mvc;
-using Plugin;
-using ServiceLayer.Interface;
+using Plugins.Interfaces;
+using Services;
 using System;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace PubSubHubBubReciever.Controllers
@@ -15,21 +14,16 @@ namespace PubSubHubBubReciever.Controllers
     [ApiController]
     public class ManageController : ControllerBase
     {
-        private readonly ITopicDataService dataService;
-        private readonly ISubscriptionService subscriptionService;
-        public ManageController(ITopicDataService dataService, ISubscriptionService subscriptionService)
-        {
-            this.dataService = dataService;
-            this.subscriptionService = subscriptionService;
-        }
-
         [HttpPost]
         public async Task<IActionResult> Post([FromQuery(Name = "adminToken")] string adminToken,
             [FromQuery(Name = "topicUrl")] string topicUrl,
-            [FromQuery(Name = "Parser")] string parserName,
-            [FromQuery(Name = "Publisher")] string publisherName)
+            [FromQuery(Name = "Consumer")] string consumerName,
+            [FromQuery(Name = "Publisher")] string publisherName,
+            [FromQuery(Name = "HubUrl")] string hubUrl)
         {
-            if (!dataService.VerifyAdminToken(adminToken))
+            var service = Runtime.Instance.ServiceLoader.ResolveService<ITopicDataService>();
+
+            if (!service.VerifyAdminToken(adminToken))
                 return StatusCode(401);
 
             if (string.IsNullOrWhiteSpace(topicUrl))
@@ -39,75 +33,63 @@ namespace PubSubHubBubReciever.Controllers
                 return StatusCode(400);
 
             var id = ulong.Parse(new Random().Next(10000000, 100000000).ToString() + DateTimeOffset.Now.ToUnixTimeSeconds().ToString());
-            var idBytes = BitConverter.GetBytes(id);
-            var token = BitConverter.ToString(SHA256.Create().ComputeHash(idBytes)).Replace("-", "").ToLower();
 
-            var tokenBytes = Encoding.UTF8.GetBytes(token);
+            consumerName = consumerName is null ? "Default_YouTubeConsumer" : consumerName;
+            publisherName = publisherName is null ? "Default_DiscordPublisher" : publisherName;
 
-            var secretBytes = idBytes.ToList();
-            secretBytes.AddRange(tokenBytes);
+            using var sr = new StreamReader(Request.Body);
+            var bodyString = await sr.ReadToEndAsync();
+            var infos = Regex.Split(bodyString, @"(\r\n|\r|\n)").Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
 
-            var secret = BitConverter.ToString(SHA256.Create().ComputeHash(secretBytes.ToArray())).Replace("-", "").ToLower();
+            var consumer = Runtime.Instance.PluginLoader.ResolvePlugin<IConsumerPlugin>(consumerName);
 
-            DataSub dataSub = new DataSub()
+            DataSub dataSub = new()
             {
                 TopicID = id,
                 TopicURL = topicUrl,
-                Token = token,
-                Secret = secret,
-                FeedParser = parserName is null ? "YouTubeXmlParser" : parserName,
-                FeedPublisher = publisherName is null ? "DiscordWebhookPublisher" : publisherName
-            };
+                HubURL = hubUrl,
 
-            LeaseSub leaseSub = new LeaseSub()
-            {
-                TopicID = id,
+                FeedConsumer = consumerName,
+                FeedPublisher = publisherName,
+                ConsumerData = consumer.AddSubscription(id, infos),
+                PublisherData = Runtime.Instance.PluginLoader.ResolvePlugin<IPublisherPlugin>(publisherName).AddSubscription(id, infos),
+
                 LastLease = DateTime.MinValue,
                 LeaseTime = 0,
                 Subscribed = false
             };
 
-            using var sr = new StreamReader(HttpContext.Request.Body);
-            var bodyString = await sr.ReadToEndAsync();
-
-            var parser = PluginManager.Instance.ResolveParserPlugin(dataSub.FeedParser);
-            if (parser is null)
-                return StatusCode(426, $"No parser plugin with name {dataSub.FeedParser} is registered");
-            var publisher = PluginManager.Instance.ResolvePublishPlugin(dataSub.FeedPublisher);
-            if (publisher is null)
-                return StatusCode(426, $"No publisher plugin with name {dataSub.FeedParser} is registered");
-
-            dataSub.ParserData = parser.TopicAdded(dataSub, bodyString.Split(Environment.NewLine));
-            dataSub.PublisherData = publisher.TopicAdded(dataSub, bodyString.Split(Environment.NewLine));
-
-            if (!dataService.AddTopic(dataSub, leaseSub))
+            if (!service.AddTopic(dataSub))
                 return StatusCode(500);
 
-            if (!await subscriptionService.SubscribeAsync(dataSub))
+            if (!await consumer.SubscribeAsync(dataSub))
             {
-                dataService.DeleteTopic(dataSub, leaseSub);
+                service.DeleteTopic(dataSub);
                 return StatusCode(500);
             }
+            dataSub.Subscribed = true;
+            Runtime.Instance.ServiceLoader.ResolveService<IDataProviderService>().Save();
 
-            return Ok(id.ToString() + Environment.NewLine + token + Environment.NewLine + secret);
+            return Ok(dataSub);
         }
 
         [HttpDelete]
         public async Task<IActionResult> Delete([FromQuery(Name = "adminToken")] string adminToken,
             [FromQuery(Name = "topicId")] ulong topicId)
         {
-            if (!dataService.VerifyAdminToken(adminToken))
+            var service = Runtime.Instance.ServiceLoader.ResolveService<ITopicDataService>();
+
+            if (!service.VerifyAdminToken(adminToken))
                 return StatusCode(401);
 
-            if (!(dataService.GetLeaseSub(topicId) is LeaseSub leaseSub))
+            if (service.GetDataSub(topicId) is not DataSub dataSub)
                 return StatusCode(404);
-            var dataSub = dataService.GetDataSub(topicId);
 
-            if (leaseSub.Subscribed)
-                if (!await subscriptionService.SubscribeAsync(dataSub, false))
+            if (dataSub.Subscribed)
+                if (!await Runtime.Instance.PluginLoader.ResolvePlugin<IConsumerPlugin>(dataSub.FeedConsumer).SubscribeAsync(dataSub, false))
                     return StatusCode(500);
 
-            if (!dataService.DeleteTopic(dataSub, leaseSub))
+            if (!service.DeleteTopic(dataSub))
                 return StatusCode(500);
 
             return Ok();
@@ -117,65 +99,48 @@ namespace PubSubHubBubReciever.Controllers
         public async Task<IActionResult> Patch([FromQuery(Name = "adminToken")] string adminToken,
             [FromQuery(Name = "topicId")] ulong topicId,
             [FromQuery(Name = "topicUrl")] string topicUrl,
-            [FromQuery(Name = "Parser")] string parser,
-            [FromQuery(Name = "Publisher")] string publisher)
+            [FromQuery(Name = "Consumer")] string consumer,
+            [FromQuery(Name = "Publisher")] string publisher,
+            [FromQuery(Name = "HubUrl")] string hubUrl)
         {
-            if (!dataService.VerifyAdminToken(adminToken))
+            var service = Runtime.Instance.ServiceLoader.ResolveService<ITopicDataService>();
+
+            if (!service.VerifyAdminToken(adminToken))
                 return StatusCode(401);
 
-            if (!(dataService.GetLeaseSub(topicId) is LeaseSub leaseSub))
+            if (service.GetDataSub(topicId) is not DataSub dataSub)
                 return StatusCode(404);
-            var dataSub = dataService.GetDataSub(topicId);
 
-            DataSub topic = new DataSub()
+            await Runtime.Instance.PluginLoader.ResolvePlugin<IConsumerPlugin>(dataSub.FeedConsumer).SubscribeAsync(dataSub, false);
+
+            using var sr = new StreamReader(Request.Body);
+            var bodyString = await sr.ReadToEndAsync();
+            var infos = bodyString.Split(Environment.NewLine);
+
+            var consumerPlugin = Runtime.Instance.PluginLoader.ResolvePlugin<IConsumerPlugin>(consumer ?? dataSub.FeedConsumer);
+            var publisherPlugin = Runtime.Instance.PluginLoader.ResolvePlugin<IPublisherPlugin>(publisher ?? dataSub.FeedPublisher);
+
+            DataSub topic = new()
             {
                 TopicID = topicId,
                 TopicURL = topicUrl ?? dataSub.TopicURL,
-                Token = dataSub.Token,
-                Secret = dataSub.Secret,
-                FeedParser = parser ?? dataSub.FeedParser,
-                FeedPublisher = publisher ?? dataSub.FeedPublisher
-            };
+                HubURL = hubUrl ?? dataSub.HubURL,
 
-            LeaseSub lease = new LeaseSub()
-            {
-                TopicID = topicId,
+                FeedConsumer = consumer ?? dataSub.FeedConsumer,
+                FeedPublisher = publisher ?? dataSub.FeedPublisher,
+                ConsumerData = consumer is null ? consumerPlugin.UpdateSubscription(topicId, dataSub.ConsumerData, infos) : consumerPlugin.AddSubscription(topicId, infos),
+                PublisherData = publisher is null ? publisherPlugin.UpdateSubscription(topicId, dataSub.PublisherData, infos) : consumerPlugin.AddSubscription(topicId, infos),
+
                 LastLease = DateTime.MinValue,
                 LeaseTime = 0,
                 Subscribed = false
             };
 
-            using var sr = new StreamReader(HttpContext.Request.Body);
-            var bodyString = await sr.ReadToEndAsync();
-
-            var parserPlugin = PluginManager.Instance.ResolveParserPlugin(topic.FeedParser);
-            if (parserPlugin is null)
-                return StatusCode(426, $"No parser plugin with name {topic.FeedParser} is registered");
-            var publisherPlugin = PluginManager.Instance.ResolvePublishPlugin(topic.FeedPublisher);
-            if (publisherPlugin is null)
-                return StatusCode(426, $"No publisher plugin with name {topic.FeedPublisher} is registered");
-
-            dataSub.ParserData = parserPlugin.TopicAdded(dataSub, bodyString.Split(Environment.NewLine));
-            dataSub.PublisherData = publisherPlugin.TopicAdded(dataSub, bodyString.Split(Environment.NewLine));
-
-            if (leaseSub.Subscribed)
-                if (!await subscriptionService.SubscribeAsync(dataSub, false))
-                    return StatusCode(500);
-
-            if (!dataService.UpdateTopic(topic, lease))
+            if (!service.UpdateTopic(topic))
                 return StatusCode(500);
 
-            if (leaseSub.Subscribed)
-            {
-                if (!await subscriptionService.SubscribeAsync(topic))
-                {
-                    dataService.UpdateTopic(dataSub, leaseSub);
-                    return StatusCode(500);
-                }
-            }
-            else
-                return Ok("Topic is currently not subscribed, inputs have not been verified!");
-
+            if (!await consumerPlugin.SubscribeAsync(topic))
+                return StatusCode(500);
             return Ok();
         }
 
@@ -184,17 +149,18 @@ namespace PubSubHubBubReciever.Controllers
         public async Task<IActionResult> ToggleSubscription([FromQuery(Name = "adminToken")] string adminToken,
             [FromQuery(Name = "topicId")] ulong topicId)
         {
-            if (!dataService.VerifyAdminToken(adminToken))
+            var service = Runtime.Instance.ServiceLoader.ResolveService<ITopicDataService>();
+
+            if (!service.VerifyAdminToken(adminToken))
                 return StatusCode(401);
 
-            if (!(dataService.GetLeaseSub(topicId) is LeaseSub leaseSub))
+            if (service.GetDataSub(topicId) is not DataSub dataSub)
                 return StatusCode(404);
-            var dataSub = dataService.GetDataSub(topicId);
 
-            if (!await subscriptionService.SubscribeAsync(dataSub, !leaseSub.Subscribed))
+            if (!await Runtime.Instance.PluginLoader.ResolvePlugin<IConsumerPlugin>(dataSub.FeedConsumer).SubscribeAsync(dataSub, !dataSub.Subscribed))
                 return StatusCode(500);
 
-            return Ok("Status changed to: " + leaseSub.Subscribed);
+            return Ok("Status changed to: " + dataSub.Subscribed);
         }
     }
 }

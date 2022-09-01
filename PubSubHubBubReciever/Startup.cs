@@ -4,10 +4,8 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using PubSubHubBubReciever.Controllers;
-using ServiceLayer.DataService;
-using ServiceLayer.Interface;
-using ServiceLayer.Service;
+using Microsoft.OpenApi.Models;
+using Services;
 using System;
 
 namespace PubSubHubBubReciever
@@ -17,21 +15,18 @@ namespace PubSubHubBubReciever
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            subscriptionService = new SubscriptionService(new TopicDataService());
         }
 
         internal IConfiguration Configuration { get; }
-        private readonly ISubscriptionService subscriptionService;
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<ITopicDataService, TopicDataService>();
-            services.AddSingleton<ISubscriptionService, SubscriptionService>();
-
             services.Configure<KestrelServerOptions>(options => options.AllowSynchronousIO = true);
 
             services.AddControllers().AddXmlSerializerFormatters();
+
+            services.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo { Title = "PubSubHubBubReciever", Version = "v1" }));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -40,6 +35,8 @@ namespace PubSubHubBubReciever
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseSwagger();
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "PubSubHubBubReciever v1"));
             }
 
             app.UseRouting();
@@ -58,17 +55,17 @@ namespace PubSubHubBubReciever
         private void OnAppStarted()
         {
 #if !DEBUG
-            subscriptionService.SubscribeAll();
+            Runtime.Instance.ServiceLoader.ResolveService<ISubscriptionService>().SubscribeAll();
 #endif
         }
 
         private void OnAppStopping()
         {
-            subscriptionService.UnsubscribeAll();
+            Runtime.Instance.ServiceLoader.ResolveService<ISubscriptionService>().UnsubscribeAll();
 
             Console.WriteLine("Getting cancellation Token and waiting for cancellation or 3 min.");
-            var cancellationToken = FeedRecieverController.tokenSource.Token;
-            cancellationToken.WaitHandle.WaitOne(TimeSpan.FromSeconds(180));
+            var cancellationToken = Runtime.Instance.TokenSource.Token;
+            cancellationToken.WaitHandle.WaitOne(TimeSpan.FromMinutes(3));
             Console.WriteLine(cancellationToken.IsCancellationRequested ?
                 "Timeout cancelled, unsubscribe successful, continuing graceful shutdown." :
                 "Timeout, shutting down w/o or with partial unsubscribe.");

@@ -270,3 +270,4 @@ settings.env
 Bulklog.txt
 /PubSubHubBubReciever/leases.json
 /PubSubHubBubReciever/data.json
+settings.runsettings

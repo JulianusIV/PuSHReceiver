@@ -1,118 +1,142 @@
-﻿using DataAccessLayer.Repository;
-using DataLayer.JSONObject;
-using ServiceLayer.Interface;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Data.JSONObjects;
+using PubSubHubBubReciever;
+using Services;
 
-namespace ServiceLayer.DataService
+namespace ServiceLayer
 {
     public class TopicDataService : ITopicDataService
     {
-        bool ITopicDataService.AddTopic(DataSub dataSub, LeaseSub leaseSub)
+        public bool AddTopic(DataSub dataSub)
         {
-            TopicRepository.Data.Subs.Add(dataSub);
-            TopicRepository.Leases.Subs.Add(leaseSub);
+            var provider = Runtime.Instance.ServiceLoader.ResolveService<IDataProviderService>();
+
+            provider.Data.Subs.Add(dataSub);
             try
             {
-                TopicRepository.Save(FileNames.data);
-                TopicRepository.Save(FileNames.leases);
+                provider.Save();
             }
             catch (Exception)
             {
-                TopicRepository.Data.Subs.Remove(dataSub);
-                TopicRepository.Leases.Subs.Remove(leaseSub);
+                provider.Data.Subs.Remove(dataSub);
                 return false;
             }
             return true;
         }
 
-        int ITopicDataService.CountSubbedTopics()
-            => TopicRepository.Leases.Subs.Count(x => x.Subscribed);
-
-        bool ITopicDataService.DeleteTopic(DataSub dataSub, LeaseSub leaseSub)
+        public int CountSubbedTopics()
         {
-            TopicRepository.Data.Subs.Remove(dataSub);
-            TopicRepository.Leases.Subs.Remove(leaseSub);
+            var provider = Runtime.Instance.ServiceLoader.ResolveService<IDataProviderService>();
+
+            return provider.Data.Subs.Count(x => x.Subscribed);
+        }
+
+        public bool DeleteTopic(DataSub dataSub)
+        {
+            var provider = Runtime.Instance.ServiceLoader.ResolveService<IDataProviderService>();
+
+            provider.Data.Subs.Remove(dataSub);
             try
             {
-                TopicRepository.Save(FileNames.data);
-                TopicRepository.Save(FileNames.leases);
+                provider.Save();
             }
             catch (Exception)
             {
-                TopicRepository.Data.Subs.Add(dataSub);
-                TopicRepository.Leases.Subs.Add(leaseSub);
+                provider.Data.Subs.Add(dataSub);
                 return false;
             }
             return true;
         }
 
-        string ITopicDataService.GetCallback(ulong id)
-            => TopicRepository.Data.CallbackURL + "/" + id.ToString();
-
-        DataSub ITopicDataService.GetDataSub(ulong id)
-            => TopicRepository.Data.Subs.SingleOrDefault(x => x.TopicID == id);
-
-        (List<DataSub>, List<LeaseSub>) ITopicDataService.GetExpiredAndRunningSubs()
+        public string GetCallback(ulong id)
         {
-            var expired = TopicRepository.Data.Subs.Where(x =>
-            {
-                var lease = TopicRepository.Leases.Subs.Single(y => y.TopicID == x.TopicID);
-                var leaseExpiration = lease.LastLease + TimeSpan.FromSeconds(lease.LeaseTime);
-                return leaseExpiration < DateTime.Now || !lease.Subscribed;
-            }).ToList();
-            var running = TopicRepository.Leases.Subs.Where(x => !expired.Any(y => y.TopicID == x.TopicID)).ToList();
-            return (expired, running);
+            var provider = Runtime.Instance.ServiceLoader.ResolveService<IDataProviderService>();
+
+            return $"{provider.Data.CallbackURL}/{id}";
         }
 
-        LeaseSub ITopicDataService.GetLeaseSub(ulong id)
-            => TopicRepository.Leases.Subs.Single(x => x.TopicID == id);
-
-        List<DataSub> ITopicDataService.GetSubbedTopics()
+        public DataSub? GetDataSub(ulong id)
         {
-            return TopicRepository.Data.Subs.Where(x =>
-            {
-                var lease = TopicRepository.Leases.Subs.Single(y => y.TopicID == x.TopicID);
-                return lease.Subscribed;
-            }).ToList();
+            var provider = Runtime.Instance.ServiceLoader.ResolveService<IDataProviderService>();
+
+            return provider.Data.Subs.SingleOrDefault(x => x.TopicID == id);
         }
 
-        void ITopicDataService.UpdateLease(ulong id, bool subscribe, int leaseTime)
+        public IEnumerable<DataSub> GetExpiredSubs()
         {
-            var lease = TopicRepository.Leases.Subs.Single(x => x.TopicID == id);
+            var provider = Runtime.Instance.ServiceLoader.ResolveService<IDataProviderService>();
+
+            return provider.Data.Subs.Where(x => (x.LastLease + TimeSpan.FromSeconds(x.LeaseTime) < DateTime.Now) || !x.Subscribed);
+        }
+
+        public IEnumerable<DataSub> GetRunningSubs()
+        {
+            var provider = Runtime.Instance.ServiceLoader.ResolveService<IDataProviderService>();
+
+            return provider.Data.Subs.Where(x => (x.LastLease + TimeSpan.FromSeconds(x.LeaseTime) >= DateTime.Now) || x.Subscribed);
+        }
+
+        public IEnumerable<DataSub> GetSubbedTopics()
+        {
+            var provider = Runtime.Instance.ServiceLoader.ResolveService<IDataProviderService>();
+
+            return provider.Data.Subs.Where(x => x.Subscribed);
+        }
+
+        public bool UpdateLease(ulong id, bool subscribe, int leaseTime = 0)
+        {
+            var provider = Runtime.Instance.ServiceLoader.ResolveService<IDataProviderService>();
+            var lease = GetDataSub(id);
+            if (lease is null)
+                return false;
+            var oldLeaseTime = lease.LeaseTime;
+            var oldLastLease = lease.LastLease;
+            var oldSubscribed = lease.Subscribed;
             lease.LeaseTime = leaseTime;
             lease.LastLease = leaseTime == 0 ? DateTime.MinValue : DateTime.Now;
             lease.Subscribed = subscribe;
-            TopicRepository.Save(FileNames.leases);
-        }
-
-        bool ITopicDataService.UpdateTopic(DataSub dataSub, LeaseSub leaseSub)
-        {
-            var oldDataSub = ((ITopicDataService)this).GetDataSub(dataSub.TopicID);
-            var oldLeaseSub = ((ITopicDataService)this).GetLeaseSub(dataSub.TopicID);
-
-            var dataIndex = TopicRepository.Data.Subs.IndexOf(oldDataSub);
-            var leaseIndex = TopicRepository.Leases.Subs.IndexOf(oldLeaseSub);
-
-            TopicRepository.Data.Subs[dataIndex] = dataSub;
-            TopicRepository.Leases.Subs[leaseIndex] = leaseSub;
-
             try
             {
-                TopicRepository.Save(FileNames.data);
-                TopicRepository.Save(FileNames.leases);
+                provider.Save();
             }
             catch (Exception)
             {
-                TopicRepository.Data.Subs[dataIndex] = oldDataSub;
-                TopicRepository.Leases.Subs[leaseIndex] = oldLeaseSub;
+                lease.LeaseTime = oldLeaseTime;
+                lease.LastLease = oldLastLease;
+                lease.Subscribed = oldSubscribed;
                 return false;
             }
             return true;
         }
 
-        bool ITopicDataService.VerifyAdminToken(string token)
-            => TopicRepository.Data.AdminToken == token;
+        public bool UpdateTopic(DataSub dataSub)
+        {
+            var provider = Runtime.Instance.ServiceLoader.ResolveService<IDataProviderService>();
+
+            var oldDataSub = GetDataSub(dataSub.TopicID);
+            if (oldDataSub is null)
+                return false;
+
+            var index = provider.Data.Subs.IndexOf(oldDataSub);
+
+            provider.Data.Subs[index] = dataSub;
+
+            try
+            {
+                provider.Save();
+            }
+            catch (Exception)
+            {
+                provider.Data.Subs[index] = oldDataSub;
+                return false;
+            }
+            return true;
+        }
+
+        public bool VerifyAdminToken(string token)
+        {
+            var provider = Runtime.Instance.ServiceLoader.ResolveService<IDataProviderService>();
+
+            return provider.Data.AdminToken.Equals(token);
+        }
     }
 }

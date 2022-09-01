@@ -11,8 +11,9 @@ namespace ServiceLayer
             var service = Runtime.Instance.ServiceLoader.ResolveService<ITopicDataService>();
 
             foreach (var sub in service.GetExpiredSubs())
-                await Runtime.Instance.PluginLoader.ResolvePlugin<IConsumerPlugin>(sub.FeedConsumer)
-                    .SubscribeAsync(sub);
+                if (sub.FeedConsumer is not null)
+                    await Runtime.Instance.PluginLoader.ResolvePlugin<IConsumerPlugin>(sub.FeedConsumer)
+                        .SubscribeAsync(sub);
 
             foreach (var sub in service.GetRunningSubs())
                 Runtime.Instance.ServiceLoader.ResolveService<ILeaseService>()

@@ -12,8 +12,4 @@
     <ProjectReference Include="..\Services\Services.csproj" />
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy /Y &quot;$(ProjectDir)bin\Debug\net6.0\ServiceLayer.dll&quot; &quot;$(SolutionDir)PubSubHubBubReciever\bin\Debug\net6.0\ServiceLayer.dll&quot;" />
-  </Target>
-
 </Project>

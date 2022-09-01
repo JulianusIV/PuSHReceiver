@@ -17,10 +17,12 @@ namespace DefaultPlugins.YouTubeConsumer
         public string Name => "Default_YouTubeConsumer";
 
 
-        public void Init()
+        public Task InitAsync()
         {
             FeedRecieverController.OnGet += OnGetHandler;
             FeedRecieverController.OnPost += OnPostHandler;
+
+            return Task.CompletedTask;
         }
 
         public async Task<bool> SubscribeAsync(DataSub dataSub, bool subscribe = true)

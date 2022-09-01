@@ -14,7 +14,7 @@ namespace DefaultPluginsTest
         public void Init()
         {
             _plugin = new DiscordPublisherPlugin();
-            _plugin.Init();
+            _plugin.InitAsync();
         }
 
         [TestMethod]

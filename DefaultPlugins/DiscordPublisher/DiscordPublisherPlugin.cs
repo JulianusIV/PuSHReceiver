@@ -12,7 +12,7 @@ namespace DefaultPlugins.DiscordPublisher
 
         public string Name => "Default_DiscordPublisher";
 
-        public void Init() { }
+        public Task InitAsync() => Task.CompletedTask;
 
         public async Task PublishAsync(DataSub dataSub, string user, string itemUrl, params string[] args)
         {

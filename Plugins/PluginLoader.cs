@@ -30,14 +30,13 @@ namespace Plugins
             _consumerPlugins = GetPlugins<IConsumerPlugin>();
             _publisherPlugins = GetPlugins<IPublisherPlugin>();
 
-            _consumerPlugins.ForEach(x => Task.Run(() => x.Init()));
-            _publisherPlugins.ForEach(x => Task.Run(() => x.Init()));
+            _consumerPlugins.ForEach(x => _ = x.InitAsync());
+            _publisherPlugins.ForEach(x => _ = x.InitAsync());
         }
 
         private List<T> GetPlugins<T>(List<T>? plugins = null) where T : IBasePlugin
         {
-            if (plugins is null)
-                plugins = new();
+            plugins ??= new();
 
             Type pluginType = typeof(T);
 

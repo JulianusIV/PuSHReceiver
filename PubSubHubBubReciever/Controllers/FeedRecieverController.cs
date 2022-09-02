@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing.Matching;
 using Plugins;
 using System.IO;
 
@@ -12,15 +13,18 @@ namespace PubSubHubBubReciever.Controllers
         [Route("{topicId}")]
         public IActionResult Get([FromRoute] ulong topicId)
         {
-            var request = new Request();
+            var request = new Request()
+            {
+                Headers = new(),
+                QueryParameters = new(),
+                Body = null,
+            };
 
             foreach (var param in Request.Query)
                 request.QueryParameters.Add(param.Key, param.Value);
             foreach (var header in Request.Headers)
                 request.Headers.Add(header.Key, header.Value);
-            if (request.Body is null)
-                request.Body = null;
-            else
+            if (request.Body is not null)
             {
                 using var sr = new StreamReader(request.Body);
                 request.Body = sr.ReadToEnd();
@@ -46,15 +50,18 @@ namespace PubSubHubBubReciever.Controllers
         [Consumes("application/xml")]
         public IActionResult Post([FromRoute] ulong topicId)
         {
-            var request = new Request();
+            var request = new Request()
+            {
+                Headers = new(),
+                QueryParameters = new(),
+                Body = null
+            };
 
             foreach (var param in Request.Query)
                 request.QueryParameters.Add(param.Key, param.Value);
             foreach (var header in Request.Headers)
                 request.Headers.Add(header.Key, header.Value);
-            if (request.Body is null)
-                request.Body = null;
-            else
+            if (request.Body is not null)
             {
                 using var sr = new StreamReader(request.Body);
                 request.Body = sr.ReadToEnd();

@@ -14,12 +14,17 @@ namespace PubSubHubBubReciever.Controllers
         {
             var request = new Request();
 
-            using var sr = new StreamReader(request.Body);
             foreach (var param in Request.Query)
                 request.QueryParameters.Add(param.Key, param.Value);
             foreach (var header in Request.Headers)
                 request.Headers.Add(header.Key, header.Value);
-            request.Body = sr.ReadToEnd();
+            if (request.Body is null)
+            {
+                using var sr = new StreamReader(request.Body);
+                request.Body = sr.ReadToEnd();
+            }
+            else
+                request.Body = null;
 
             var ret = ApiMethodSource.InvokeGet(request, topicId);
 
@@ -43,12 +48,17 @@ namespace PubSubHubBubReciever.Controllers
         {
             var request = new Request();
 
-            using var sr = new StreamReader(request.Body);
             foreach (var param in Request.Query)
                 request.QueryParameters.Add(param.Key, param.Value);
             foreach (var header in Request.Headers)
                 request.Headers.Add(header.Key, header.Value);
-            request.Body = sr.ReadToEnd();
+            if (request.Body is null)
+            {
+                using var sr = new StreamReader(request.Body);
+                request.Body = sr.ReadToEnd();
+            }
+            else
+                request.Body = null;
 
             var ret = ApiMethodSource.InvokePost(request, topicId);
 

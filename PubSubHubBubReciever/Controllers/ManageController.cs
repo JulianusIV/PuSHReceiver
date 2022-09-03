@@ -47,7 +47,7 @@ namespace PubSubHubBubReciever.Controllers
             {
                 TopicID = id,
                 TopicURL = topicUrl,
-                HubURL = hubUrl,
+                HubURL = hubUrl is null ? "https://pubsubhubbub.appspot.com/subscribe" : hubUrl,
 
                 FeedConsumer = consumerName,
                 FeedPublisher = publisherName,
@@ -61,14 +61,6 @@ namespace PubSubHubBubReciever.Controllers
 
             if (!service.AddTopic(dataSub))
                 return StatusCode(500);
-
-            if (!await consumer.SubscribeAsync(dataSub))
-            {
-                service.DeleteTopic(dataSub);
-                return StatusCode(500);
-            }
-            dataSub.Subscribed = true;
-            Runtime.Instance.ServiceLoader.ResolveService<IDataProviderService>().Save();
 
             return Ok(dataSub);
         }
@@ -139,8 +131,6 @@ namespace PubSubHubBubReciever.Controllers
             if (!service.UpdateTopic(topic))
                 return StatusCode(500);
 
-            if (!await consumerPlugin.SubscribeAsync(topic))
-                return StatusCode(500);
             return Ok();
         }
 

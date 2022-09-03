@@ -34,7 +34,7 @@ namespace PubSubHubBubReciever
         #endregion
 
         #region Properties
-        public CancellationTokenSource TokenSource = new(); 
+        public CancellationTokenSource TokenSource = new();
         #endregion
 
         #region Plugin

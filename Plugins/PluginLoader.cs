@@ -54,8 +54,8 @@ namespace Plugins
 
             foreach (var type in types)
             {
-                T? plugin = pluginType == typeof(IConsumerPlugin) ? 
-                    (T?)Activator.CreateInstance(type, BaseCalllbackUrl, DataProviderService, LeaseService) : 
+                T? plugin = pluginType == typeof(IConsumerPlugin) ?
+                    (T?)Activator.CreateInstance(type, BaseCalllbackUrl, DataProviderService, LeaseService) :
                     (T?)Activator.CreateInstance(type);
 
                 if (plugin is null)
@@ -90,17 +90,17 @@ namespace Plugins
                 retVal = (T?)ResolveConsumerPlugin(name);
             else if (typeof(T) == typeof(IPublisherPlugin))
                 retVal = (T?)ResolvePublishPlugin(name);
-            else 
+            else
                 retVal = default;
             if (retVal is null)
                 throw new PluginNotFoundException(name);
             return retVal;
         }
 
-        private IConsumerPlugin? ResolveConsumerPlugin(string name) 
+        private IConsumerPlugin? ResolveConsumerPlugin(string name)
             => _consumerPlugins.SingleOrDefault(x => x.Name.Equals(name));
 
-        private IPublisherPlugin? ResolvePublishPlugin(string name) 
+        private IPublisherPlugin? ResolvePublishPlugin(string name)
             => _publisherPlugins.SingleOrDefault(x => x.Name.Equals(name));
     }
 }

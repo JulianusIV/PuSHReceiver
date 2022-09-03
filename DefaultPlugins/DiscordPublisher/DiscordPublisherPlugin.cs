@@ -8,11 +8,16 @@ namespace DefaultPlugins.DiscordPublisher
 {
     public class DiscordPublisherPlugin : IPublisherPlugin
     {
-        private static readonly Dictionary<ulong, Queue<string>> lastPublishUrls = new();
+        private static Dictionary<ulong, Queue<string>> lastPublishUrls = new();
 
         public string Name => "Default_DiscordPublisher";
 
-        public Task InitAsync() => Task.CompletedTask;
+        public async Task InitAsync()
+        {
+            var jsonString = await File.ReadAllTextAsync("Plugins/DiscordPublisherUrlCache.json");
+            var jsonObject = JsonSerializer.Deserialize<Dictionary<ulong, Queue<string>>>(jsonString);
+            lastPublishUrls = jsonObject is null ? new() : jsonObject;
+        }
 
         public async Task PublishAsync(DataSub dataSub, string user, string itemUrl, params string[] args)
         {
@@ -43,6 +48,9 @@ namespace DefaultPlugins.DiscordPublisher
 
             using var client = new HttpClient();
             await client.PostAsync(pluginData.WebhookURL, new StringContent(content, Encoding.UTF8, "application/json"));
+
+            var jsonString = JsonSerializer.Serialize(lastPublishUrls);
+            await File.WriteAllTextAsync("Plugins/DiscordPublisherUrlCache.json", jsonString);
         }
 
         public string? AddSubscription(ulong id, params string[] additionalInfo)

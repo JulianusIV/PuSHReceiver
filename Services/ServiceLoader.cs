@@ -22,8 +22,7 @@ namespace Services
 
         private List<IService> GetServices(List<IService>? services = null)
         {
-            if (services is null)
-                services = new();
+            services ??= new();
 
             Type serviceType = typeof(IService);
 

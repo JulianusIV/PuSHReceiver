@@ -13,8 +13,7 @@ namespace ServiceLayer
         public DataProviderService()
         {
             Load();
-            if (Data is null)
-                Data = new();
+            Data ??= new();
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
@@ -53,7 +52,7 @@ namespace ServiceLayer
         {
             File.WriteAllText("data.json", JsonSerializer.Serialize(Data, new JsonSerializerOptions() { WriteIndented = true }));
 
-            _ = Task.Run(() => 
+            _ = Task.Run(() =>
             {
                 if (Data.Subs.Any(x => x.Subscribed))
                     return;

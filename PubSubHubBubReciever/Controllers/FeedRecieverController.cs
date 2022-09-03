@@ -24,7 +24,7 @@ namespace PubSubHubBubReciever.Controllers
                 request.QueryParameters.Add(param.Key, param.Value);
             foreach (var header in Request.Headers)
                 request.Headers.Add(header.Key, header.Value);
-            if (request.Body is not null)
+            if (Request.Body is not null)
             {
                 using var sr = new StreamReader(Request.Body);
                 request.Body = sr.ReadToEnd();
@@ -61,7 +61,7 @@ namespace PubSubHubBubReciever.Controllers
                 request.QueryParameters.Add(param.Key, param.Value);
             foreach (var header in Request.Headers)
                 request.Headers.Add(header.Key, header.Value);
-            if (request.Body is not null)
+            if (Request.Body is not null)
             {
                 using var sr = new StreamReader(Request.Body);
                 request.Body = sr.ReadToEnd();

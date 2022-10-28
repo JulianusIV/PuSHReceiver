@@ -31,7 +31,7 @@ namespace PubSubHubBubReciever.Controllers
                 request.Body = sr.ReadToEnd();
             }
 
-            Console.WriteLine($"Incoming GET request to {Request.QueryString}:");
+            Console.WriteLine($"Incoming GET request to FeedReciever/{topicId}:");
             Console.WriteLine(request);
 
             var ret = ApiMethodSource.InvokeGet(request, topicId);
@@ -71,7 +71,7 @@ namespace PubSubHubBubReciever.Controllers
                 request.Body = sr.ReadToEnd();
             }
 
-            Console.WriteLine($"Incoming POST request to {Request.QueryString}:");
+            Console.WriteLine($"Incoming POST request to FeedReciever/{topicId}:");
             Console.WriteLine(request);
 
             var ret = ApiMethodSource.InvokePost(request, topicId);

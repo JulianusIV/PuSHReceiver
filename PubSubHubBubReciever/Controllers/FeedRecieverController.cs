@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Plugins;
+using System;
 using System.IO;
 
 namespace PubSubHubBubReciever.Controllers
@@ -19,6 +20,7 @@ namespace PubSubHubBubReciever.Controllers
                 Body = null,
             };
 
+
             foreach (var param in Request.Query)
                 request.QueryParameters.Add(param.Key, param.Value);
             foreach (var header in Request.Headers)
@@ -28,6 +30,9 @@ namespace PubSubHubBubReciever.Controllers
                 using var sr = new StreamReader(Request.Body);
                 request.Body = sr.ReadToEnd();
             }
+
+            Console.WriteLine($"Incoming GET request to {Request.QueryString}:");
+            Console.WriteLine(request);
 
             var ret = ApiMethodSource.InvokeGet(request, topicId);
 
@@ -65,6 +70,9 @@ namespace PubSubHubBubReciever.Controllers
                 using var sr = new StreamReader(Request.Body);
                 request.Body = sr.ReadToEnd();
             }
+
+            Console.WriteLine($"Incoming POST request to {Request.QueryString}:");
+            Console.WriteLine(request);
 
             var ret = ApiMethodSource.InvokePost(request, topicId);
 

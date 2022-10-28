@@ -1,4 +1,5 @@
 ﻿using PubSubHubBubReciever.Controllers;
+using System.Text;
 
 namespace Plugins
 {
@@ -25,5 +26,32 @@ namespace Plugins
         public Dictionary<string, string> Headers { get; set; }
         public string Body { get; set; }
 #nullable enable
+
+        public override string ToString()
+        {
+            StringBuilder stringBuilder = new();
+
+            if (QueryParameters is not null && QueryParameters.Any())
+            {
+                stringBuilder.AppendLine("Parameters:");
+                foreach (var parameter in QueryParameters)
+                    stringBuilder.AppendLine(parameter.ToString());
+            }
+
+            if (Headers is not null && Headers.Any())
+            {
+                stringBuilder.AppendLine("Headers:");
+                foreach (var header in Headers)
+                    stringBuilder.AppendLine(header.ToString());
+            }
+
+            if (!string.IsNullOrWhiteSpace(Body))
+            {
+                stringBuilder.AppendLine("Body:");
+                stringBuilder.AppendLine(Body);
+            }
+
+            return stringBuilder.ToString();
+        }
     }
 }

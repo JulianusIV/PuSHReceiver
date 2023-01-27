@@ -1,8 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<RunSettings>
-    <RunConfiguration>
-        <EnvironmentVariables>
-            <DISCORD_TEST_WEBHOOK_URL>WebhookUrl</DISCORD_TEST_WEBHOOK_URL>
-        </EnvironmentVariables>
-    </RunConfiguration>
-</RunSettings>

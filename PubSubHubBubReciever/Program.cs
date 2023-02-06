@@ -21,10 +21,9 @@ builder.Services.AddControllers();
 builder.Services.AddTransient<IDbContext, DbContext>();
 builder.Services.AddTransient<ILeaseRepository, LeaseRepository>();
 builder.Services.AddTransient<IPluginRepository, PluginRepository>();
-builder.Services.AddSingleton<IPluginManager, PluginManager>();
+builder.Services.AddTransient<ISubscriptionService, SubscriptionService>();
 builder.Services.AddSingleton<ILeaseService, LeaseService>();
-builder.Services.AddSingleton<ISubscriptionService, SubscriptionService>();
-builder.Services.AddSingleton<IShutdownService, ShutdownService>();
+builder.Services.AddSingleton<IPluginManager, PluginManager>();
 builder.Services.AddSingleton<IShutdownService, ShutdownService>();
 
 // add swagger stuff

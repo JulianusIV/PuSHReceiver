@@ -65,7 +65,7 @@ services:
       MYSQL_USER: "example"
       MYSQL_PASSWORD: "example"
     volumes:
-      - push_data_volume
+      - push_data_volume:/var/lib/mysql
     # dont publish this port unless you need to access the database remotely
     #ports:
     #  - '3306:3306'

@@ -1,4 +1,5 @@
 ﻿using PluginLibrary.PluginRepositories;
+using Microsoft.Extensions.Logging;
 
 namespace PluginLibrary.Interfaces
 {
@@ -6,6 +7,7 @@ namespace PluginLibrary.Interfaces
     {
         public string Name { get; }
         public IPluginRepository? PluginRepository { get; set; }
+        public ILogger? Logger { get; set; }
         public Task InitAsync();
     }
 }

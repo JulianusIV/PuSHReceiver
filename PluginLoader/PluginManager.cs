@@ -1,4 +1,5 @@
-﻿using Contracts;
+﻿using Configuration;
+using Contracts;
 using Microsoft.Extensions.Logging;
 using PluginLibrary;
 using PluginLibrary.Interfaces;
@@ -35,9 +36,7 @@ namespace PluginLoader
             LoadDlls(@"Plugins");
 #endif
             //if envvar is set to true or null load default plugins from working directory (bin folder when debugging)
-            var envVar = Environment.GetEnvironmentVariable("LOADDEFAULTPLUGINS");
-            bool loadDefault = envVar is null || bool.Parse(envVar);
-            if (loadDefault)
+            if (ConfigurationManager.PluginsConfig.UseDefaultPlugins)
             {
 #if DEBUG
                 LoadDlls(@"bin\Debug\net7.0");
@@ -137,8 +136,9 @@ namespace PluginLoader
                     _logger.LogError("Pluginloader failed to load plugins due to duplicate plugin name {Name}!", plugin.Name);
                     throw new DuplicatePluginNameException("Pluginloader failed to load plugins due to duplicate plugin name!", plugin.Name);
                 }
-                //DI repo into plugin
+                //DI into plugin
                 plugin.PluginRepository = _pluginRepository;
+                plugin.Logger = _logger;
                 //asyncronously call init
                 _ = plugin.InitAsync();
                 //find plugin data type and add to dictionary

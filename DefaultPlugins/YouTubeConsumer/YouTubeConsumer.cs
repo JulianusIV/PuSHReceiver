@@ -1,4 +1,5 @@
-﻿using Models;
+﻿using Microsoft.Extensions.Logging;
+using Models;
 using Models.ApiCommunication;
 using PluginLibrary.Interfaces;
 using PluginLibrary.PluginRepositories;
@@ -15,6 +16,7 @@ namespace DefaultPlugins.YouTubeConsumer
         public string Name => "Default_YoutubeConsumer";
         //DI
         public IPluginRepository? PluginRepository { get; set; }
+        public ILogger? Logger { get; set; }
 
         public Response HandleGet(Lease lease, Request request)
         {
@@ -46,23 +48,18 @@ namespace DefaultPlugins.YouTubeConsumer
             }
 
             //update lease object in db
-            //TODO add this as methods on the lease object instead, and pass parameters
             switch (request.QueryParameters["hub.mode"])
             {
                 case "subscribe":
                     int leaseTime = int.Parse(request.QueryParameters["hub.lease_seconds"]);
-                    lease.LeaseTime = leaseTime;
-                    lease.LastLease = DateTime.Now;
-                    lease.Subscribed = true;
+                    lease.UpdateLeaseRecieved(true, leaseTime);
                     PluginRepository!.SaveData(lease);
 
                     response.ResponseBody = request.QueryParameters["hub.challenge"];
                     response.ReturnStatus = HttpStatusCode.OK;
                     return response;
                 case "unsubscribe":
-                    lease.LeaseTime = 0;
-                    lease.LastLease = DateTime.MinValue;
-                    lease.Subscribed = false;
+                    lease.UpdateLeaseRecieved(false);
                     PluginRepository!.SaveData(lease);
 
                     response.ResponseBody = request.QueryParameters["hub.challenge"];
@@ -172,9 +169,7 @@ namespace DefaultPlugins.YouTubeConsumer
             var response = await client.SendAsync(request);
             var result = response.StatusCode == HttpStatusCode.NoContent;
             if (!result)
-            {
-                //TODO log failure
-            }
+                Logger?.LogError("Subscribe failed with status code {status}.", response.StatusCode);
             return result;
         }
     }

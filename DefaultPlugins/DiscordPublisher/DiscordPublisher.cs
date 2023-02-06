@@ -1,4 +1,5 @@
-﻿using Models;
+﻿using Microsoft.Extensions.Logging;
+using Models;
 using Models.ApiCommunication;
 using PluginLibrary.Interfaces;
 using PluginLibrary.PluginRepositories;
@@ -16,6 +17,7 @@ namespace DefaultPlugins.DiscordPublisher
         public string Name => "Default_DiscordPublisher";
         //DI
         public IPluginRepository? PluginRepository { get; set; }
+        public ILogger? Logger { get; set; }
 
         public async Task InitAsync()
         {

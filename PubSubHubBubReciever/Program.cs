@@ -11,6 +11,20 @@ using Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//config shit
+builder.Configuration.AddIniFile("settings.ini");
+var webConfig = builder.Configuration.GetSection("web").Get<Configuration.WebConfig>();
+if (webConfig is not null)
+    Configuration.ConfigurationManager.WebConfig = webConfig;
+
+var dbConfig = builder.Configuration.GetSection("database").Get<Configuration.DbConfig>();
+if (dbConfig is not null)
+    Configuration.ConfigurationManager.DbConfig = dbConfig;
+
+var pluginsConfig = builder.Configuration.GetSection("plugins").Get<Configuration.PluginsConfig>();
+if (pluginsConfig is not null)
+    Configuration.ConfigurationManager.PluginsConfig = pluginsConfig;
+
 //add logger for DI
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();

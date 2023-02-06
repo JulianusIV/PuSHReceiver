@@ -30,6 +30,13 @@ namespace Models
             TopicUrl = topicUrl;
         }
 
+        public void UpdateLeaseRecieved(bool subscribe, int leaseTime = 0)
+        {
+            this.LeaseTime = leaseTime;
+            this.LastLease = DateTime.Now;
+            this.Subscribed = subscribe;
+        }
+
         public T? GetObjectFromPublisherString<T>()
             => JsonSerializer.Deserialize<T>(PublisherData);
 
@@ -37,6 +44,6 @@ namespace Models
             => JsonSerializer.Deserialize<T>(ConsumerData);
 
         public string GetCallbackUrl()
-            => ReadConfiguration.Config.CallbackUrl + $"/{Id}";
+            => ConfigurationManager.WebConfig.CallbackUrl + $"/{Id}";
     }
 }

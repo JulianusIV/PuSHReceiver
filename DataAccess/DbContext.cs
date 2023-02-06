@@ -10,6 +10,10 @@ namespace DataAccess
         public DbSet<Lease> Leases => Set<Lease>();
         public DbSet<User> Users => Set<User>();
 
+        //ensure latest migration is applied to the current db
+        public DbContext()
+            => Database.Migrate();
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
             => optionsBuilder.UseMySQL(ReadConfiguration.Config.ConnectionString);
     }

@@ -11,8 +11,4 @@
     <ProjectReference Include="..\PluginLibrary\PluginLibrary.csproj" />
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if $(ConfigurationName) == Debug (&#xD;&#xA;copy &quot;$(OutputPath)DefaultPlugins.dll&quot; &quot;../PubSubHubBubReciever/bin/Debug/net7.0/DefaultPlugins.dll&quot;)" />
-  </Target>
-
 </Project>

@@ -1,6 +1,6 @@
 ﻿using Models;
 
-namespace Contracts.Repositorys
+namespace Contracts.Repositories
 {
     public interface ILeaseRepository
     {

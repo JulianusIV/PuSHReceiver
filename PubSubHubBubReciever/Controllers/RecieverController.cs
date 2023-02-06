@@ -1,5 +1,5 @@
 using Contracts;
-using Contracts.Repositorys;
+using Contracts.Repositories;
 using Contracts.Service;
 using Microsoft.AspNetCore.Mvc;
 using Models.ApiCommunication;

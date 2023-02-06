@@ -1,6 +1,6 @@
 using Contracts;
 using Contracts.DbContext;
-using Contracts.Repositorys;
+using Contracts.Repositories;
 using Contracts.Service;
 using DataAccess;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
@@ -21,9 +21,10 @@ builder.Services.AddControllers();
 builder.Services.AddTransient<IDbContext, DbContext>();
 builder.Services.AddTransient<ILeaseRepository, LeaseRepository>();
 builder.Services.AddTransient<IPluginRepository, PluginRepository>();
-builder.Services.AddTransient<ISubscriptionService, SubscriptionService>();
-builder.Services.AddSingleton<ILeaseService, LeaseService>();
 builder.Services.AddSingleton<IPluginManager, PluginManager>();
+builder.Services.AddSingleton<ILeaseService, LeaseService>();
+builder.Services.AddSingleton<ISubscriptionService, SubscriptionService>();
+builder.Services.AddSingleton<IShutdownService, ShutdownService>();
 builder.Services.AddSingleton<IShutdownService, ShutdownService>();
 
 // add swagger stuff

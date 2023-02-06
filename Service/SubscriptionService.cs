@@ -1,5 +1,5 @@
 ﻿using Contracts;
-using Contracts.Repositorys;
+using Contracts.Repositories;
 using Contracts.Service;
 using PluginLibrary.Interfaces;
 

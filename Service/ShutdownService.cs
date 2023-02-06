@@ -1,4 +1,4 @@
-﻿using Contracts.Repositorys;
+﻿using Contracts.Repositories;
 using Contracts.Service;
 using Microsoft.Extensions.Logging;
 

@@ -1,5 +1,5 @@
 ﻿using Contracts.DbContext;
-using Contracts.Repositorys;
+using Contracts.Repositories;
 using Models;
 
 namespace Repositories

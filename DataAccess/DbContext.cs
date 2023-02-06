@@ -15,6 +15,6 @@ namespace DataAccess
             => Database.Migrate();
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-            => optionsBuilder.UseMySQL(ReadConfiguration.Config.ConnectionString);
+            => optionsBuilder.UseMySql(ReadConfiguration.Config.ConnectionString, ServerVersion.AutoDetect(ReadConfiguration.Config.ConnectionString));
     }
 }

@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(DbContext))]
-    [Migration("20230204031149_AddAubscribedProperty")]
-    partial class AddAubscribedProperty
+    [Migration("20230206203852_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -22,7 +22,7 @@ namespace DataAccess.Migrations
                 .HasAnnotation("ProductVersion", "7.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("ModelLibrary.Lease", b =>
+            modelBuilder.Entity("Models.Lease", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -34,6 +34,10 @@ namespace DataAccess.Migrations
                     b.Property<string>("Consumer")
                         .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<string>("ConsumerData")
+                        .IsRequired()
+                        .HasColumnType("json");
 
                     b.Property<string>("DisplayName")
                         .IsRequired()
@@ -56,6 +60,10 @@ namespace DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<string>("PublisherData")
+                        .IsRequired()
+                        .HasColumnType("json");
+
                     b.Property<bool>("Subscribed")
                         .HasColumnType("tinyint(1)");
 
@@ -70,7 +78,7 @@ namespace DataAccess.Migrations
                     b.ToTable("Leases");
                 });
 
-            modelBuilder.Entity("ModelLibrary.User", b =>
+            modelBuilder.Entity("Models.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -96,9 +104,9 @@ namespace DataAccess.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("ModelLibrary.Lease", b =>
+            modelBuilder.Entity("Models.Lease", b =>
                 {
-                    b.HasOne("ModelLibrary.User", "Owner")
+                    b.HasOne("Models.User", "Owner")
                         .WithMany()
                         .HasForeignKey("OwnerId");
 

@@ -3,7 +3,6 @@ using System;
 using DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,22 +10,20 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(DbContext))]
-    [Migration("20230203133534_InitialMigration")]
-    partial class InitialMigration
+    partial class DbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "7.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("DataAccess.Models.Lease", b =>
+            modelBuilder.Entity("Models.Lease", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("int");
 
                     b.Property<bool>("Active")
                         .HasColumnType("tinyint(1)");
@@ -34,6 +31,10 @@ namespace DataAccess.Migrations
                     b.Property<string>("Consumer")
                         .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<string>("ConsumerData")
+                        .IsRequired()
+                        .HasColumnType("json");
 
                     b.Property<string>("DisplayName")
                         .IsRequired()
@@ -56,6 +57,13 @@ namespace DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<string>("PublisherData")
+                        .IsRequired()
+                        .HasColumnType("json");
+
+                    b.Property<bool>("Subscribed")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<string>("TopicUrl")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -67,7 +75,7 @@ namespace DataAccess.Migrations
                     b.ToTable("Leases");
                 });
 
-            modelBuilder.Entity("DataAccess.Models.User", b =>
+            modelBuilder.Entity("Models.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -93,9 +101,9 @@ namespace DataAccess.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("DataAccess.Models.Lease", b =>
+            modelBuilder.Entity("Models.Lease", b =>
                 {
-                    b.HasOne("DataAccess.Models.User", "Owner")
+                    b.HasOne("Models.User", "Owner")
                         .WithMany()
                         .HasForeignKey("OwnerId");
 

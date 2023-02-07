@@ -18,7 +18,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PluginLoader", "PluginLoade
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PluginLibrary", "PluginLibrary\PluginLibrary.csproj", "{57B9BD34-E53E-47FA-A5B1-4DBE41FF8FC7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Models", "ModelLibrary\Models.csproj", "{AA40E004-3B1A-4F8D-8560-ABB22BFF1D1A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Models", "Models\Models.csproj", "{AA40E004-3B1A-4F8D-8560-ABB22BFF1D1A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01DBAccess", "01DBAccess", "{BE2A9BD1-8CE8-48CA-B394-001A528F119D}"
 EndProject

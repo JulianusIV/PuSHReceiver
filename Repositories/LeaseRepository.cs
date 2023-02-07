@@ -37,7 +37,8 @@ namespace Repositories
 
             try
             {
-                return _dbContext.Leases.Where(x => ((x.LastLease + TimeSpan.FromSeconds(x.LeaseTime) < DateTime.Now) || !x.Subscribed) && x.Active);
+                //AsEnumerable because EFCore sometimes cant translate TimeSpan.FromSeconds
+                return _dbContext.Leases.AsEnumerable().Where(x => ((x.LastLease + TimeSpan.FromSeconds(x.LeaseTime) < DateTime.Now) || !x.Subscribed) && x.Active);
             }
             finally
             {
@@ -51,7 +52,8 @@ namespace Repositories
 
             try
             {
-                return _dbContext.Leases.Where(x => x.LastLease + TimeSpan.FromSeconds(x.LeaseTime) >= DateTime.Now);
+                //AsEnumerable because EFCore sometimes cant translate TimeSpan.FromSeconds
+                return _dbContext.Leases.AsEnumerable().Where(x => x.LastLease + TimeSpan.FromSeconds(x.LeaseTime) >= DateTime.Now);
             }
             finally
             {

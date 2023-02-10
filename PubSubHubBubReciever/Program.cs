@@ -29,7 +29,6 @@ if (pluginsConfig is not null)
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
-
 builder.Services.AddControllers();
 // Add services for DI 
 builder.Services.AddTransient<IDbContext, DbContext>();
@@ -38,7 +37,6 @@ builder.Services.AddTransient<IPluginRepository, PluginRepository>();
 builder.Services.AddSingleton<IPluginManager, PluginManager>();
 builder.Services.AddSingleton<ILeaseService, LeaseService>();
 builder.Services.AddSingleton<ISubscriptionService, SubscriptionService>();
-builder.Services.AddSingleton<IShutdownService, ShutdownService>();
 builder.Services.AddSingleton<IShutdownService, ShutdownService>();
 
 // add swagger stuff
@@ -79,12 +77,19 @@ app.Lifetime.ApplicationStarted.Register(() =>
 #endif
 });
 
-//block shutdown and unsubscribe all subscribed leases
-app.Lifetime.ApplicationStopped.Register(() =>
+//block SIGINT and unsubscribe all subscribed leases
+//this doesnt work in docker (docker stop sends SIGTERM) - if someone finds a way to graceful shutdown in docker that keeps the api up until all unsubs came back lmk
+Console.CancelKeyPress += (_, e) =>
 {
+    //cancel event -> dont stop the app
+    e.Cancel = true;
+
+    Console.WriteLine("Graceful shutdown -> unsubscribing all Leases.");
     var service = app.Services.GetRequiredService<IShutdownService>();
     service.Shutdown();
-});
+    //shutdown app after unsubs are done
+    app.Lifetime.StopApplication();
+};
 
 //run... duh
 app.Run();

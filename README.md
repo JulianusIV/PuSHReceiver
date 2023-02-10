@@ -49,25 +49,26 @@ services:
     depends_on:
       - db
     ports:
-      - 80:80
+      - '80:80'
     environment:
-      - CALLBACKURL=https://mydomain.example.com/Reciever
-      - CONNECTIONSTRING=server=localhost;database=example;user=example;password=example;Convert Zero Datetime=True
-      - LOADDEFAULTPLUGINS=true
+      CALLBACKURL: "https://mydomain.example.com/Reciever"
+      # push_db_1 here depends on your folder structure, if you have this in a folder in your home called "push" you can just leave this in
+      CONNECTIONSTRING: "server=push_db_1;database=example;user=example;password=example;Convert Zero Datetime=True"
+      LOADDEFAULTPLUGINS: "true"
   db:
     image: "mysql"
     restart: unless-stopped
     # make envvars the same as used in connectionstring -> root password can differ
     environment:
-      - MYSQL_ROOT_PASSWORD=youshallnotpass
-      - MYSQL_DATABASE=example
-      - MYSQL_USER=example
-      - MYSQL_PASSWORD=example
+      MYSQL_ROOT_PASSWORD: "youshallnotpass"
+      MYSQL_DATABASE: "example"
+      MYSQL_USER: "example"
+      MYSQL_PASSWORD: "example"
     volumes:
-      - push_data_volume
+      - push_data_volume:/var/lib/mysql
     # dont publish this port unless you need to access the database remotely
-    # ports:
-    #  - 3306:3306
+    #ports:
+    #  - '3306:3306'
 ```
 
 As you might have noticed this also needs a Domain for the Callback URL, and since it sends and receives tokens and secrets to ensure the identity of the hub, and will soon provide a login, it is highly advised to force SSL for this Callback URL. On my own server this is done using [Nginx Proxy Manager](https://nginxproxymanager.com/), forcing SSL and forwarding the requests to Port 80 of the Docker container.

@@ -5,16 +5,14 @@ namespace Models
     public class User
     {
         public int Id { get; set; }
-        public string Name { get; set; }
-        public string PasswordHash { get; set; }
-        public string Salt { get; set; }
-        public PermissionsEnum Permissions { get; set; }
+        public string UserName { get; set; }
+        public string? NormalizedName { get; set; }
+        public string? PasswordHash { get; set; }
+        public ICollection<Role> Roles { get; set; } = new List<Role>();
 
-        public User(string name, string passwordHash, string salt)
+        public User(string userName)
         {
-            Name = name;
-            PasswordHash = passwordHash;
-            Salt = salt;
+            UserName = userName;
         }
     }
 }

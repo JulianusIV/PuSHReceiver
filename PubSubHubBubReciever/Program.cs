@@ -3,7 +3,10 @@ using Contracts.DbContext;
 using Contracts.Repositories;
 using Contracts.Service;
 using DataAccess;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Models;
 using PluginLibrary.PluginRepositories;
 using PluginLoader;
 using Repositories;
@@ -30,6 +33,9 @@ builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
 builder.Services.AddControllers();
+builder.Services.AddRazorPages();
+builder.Services.AddServerSideBlazor();
+
 // Add services for DI 
 builder.Services.AddTransient<IDbContext, DbContext>();
 builder.Services.AddTransient<ILeaseRepository, LeaseRepository>();
@@ -56,13 +62,21 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+else
+{
+    app.UseExceptionHandler("/Error");
+}
 
 //https and auth stuff
 app.UseHttpsRedirection();
 
+app.UseStaticFiles();
+
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapBlazorHub();
+app.MapFallbackToPage("/_Host");
 
 //subscribe all topics at startup
 app.Lifetime.ApplicationStarted.Register(() =>

@@ -9,7 +9,6 @@ namespace DataAccess
     {
         public DbSet<Lease> Leases => Set<Lease>();
         public DbSet<User> Users => Set<User>();
-
         public DbSet<Role> Roles => Set<Role>();
 
         //ensure latest migration is applied to the current db

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PubSubHubBubReciever.Models;
 using System.Diagnostics;
 
@@ -18,6 +19,7 @@ namespace PubSubHubBubReciever.Controllers
             return View();
         }
 
+        [Authorize(Policy = "AdminOnly")]
         public IActionResult Privacy()
         {
             return View();

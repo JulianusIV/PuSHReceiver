@@ -42,15 +42,15 @@ builder.Services.AddSingleton<ILeaseService, LeaseService>();
 builder.Services.AddSingleton<ISubscriptionService, SubscriptionService>();
 builder.Services.AddSingleton<IShutdownService, ShutdownService>();
 
+builder.Services.AddAuthorization(options => options.AddPolicy("AdminOnly", policy => policy.RequireClaim("Administrator")));
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme,
         options =>
         {
-            options.LoginPath = "/Login";
-            options.LogoutPath = "/Logout";
+            options.LoginPath = "/Authentication/Login";
+            options.LogoutPath = "/Authentication/Logout";
         });
 //builder.Services.AddMvc();
-builder.Services.AddAuthentication(options => options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme);
 builder.Services.AddDistributedMemoryCache();
 
 // add swagger stuff

@@ -3,10 +3,8 @@ using Contracts.DbContext;
 using Contracts.Repositories;
 using Contracts.Service;
 using DataAccess;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
-using Models;
 using PluginLibrary.PluginRepositories;
 using PluginLoader;
 using Repositories;
@@ -32,18 +30,28 @@ if (pluginsConfig is not null)
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
-builder.Services.AddControllers();
-builder.Services.AddRazorPages();
-builder.Services.AddServerSideBlazor();
+builder.Services.AddControllersWithViews();
 
 // Add services for DI 
 builder.Services.AddTransient<IDbContext, DbContext>();
 builder.Services.AddTransient<ILeaseRepository, LeaseRepository>();
 builder.Services.AddTransient<IPluginRepository, PluginRepository>();
+builder.Services.AddTransient<IUserRepository, UserRepository>();
 builder.Services.AddSingleton<IPluginManager, PluginManager>();
 builder.Services.AddSingleton<ILeaseService, LeaseService>();
 builder.Services.AddSingleton<ISubscriptionService, SubscriptionService>();
 builder.Services.AddSingleton<IShutdownService, ShutdownService>();
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme,
+        options =>
+        {
+            options.LoginPath = "/Login";
+            options.LogoutPath = "/Logout";
+        });
+//builder.Services.AddMvc();
+builder.Services.AddAuthentication(options => options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme);
+builder.Services.AddDistributedMemoryCache();
 
 // add swagger stuff
 builder.Services.AddEndpointsApiExplorer();
@@ -69,14 +77,17 @@ else
 
 //https and auth stuff
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
 
+app.UseRouting();
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapBlazorHub();
-app.MapFallbackToPage("/_Host");
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 //subscribe all topics at startup
 app.Lifetime.ApplicationStarted.Register(() =>

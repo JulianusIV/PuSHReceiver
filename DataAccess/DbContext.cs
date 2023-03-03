@@ -15,6 +15,11 @@ namespace DataAccess
         //public DbContext()
         //    => Database.Migrate();
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<User>().Navigation(e => e.Roles).AutoInclude();
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
             => optionsBuilder.UseMySql(ConfigurationManager.DbConfig.ConnectionString, ServerVersion.AutoDetect(ConfigurationManager.DbConfig.ConnectionString));
     }

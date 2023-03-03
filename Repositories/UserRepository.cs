@@ -24,6 +24,26 @@ namespace Repositories
         public UserRepository(IDbContext dbContext)
         {
             _dbContext = dbContext;
+
+            _semaphore.Wait();
+
+            try
+            {
+                if (!_dbContext.Users.Any())
+                {
+                    var user = new User("Admin", "5F23E4F71C3C727AB02B49793EF10A9F2FBD98B62562D658AB585CB399BE23DB:87513C55EB8463A4FFC056E06F612013:100000:SHA256") { Id = 1 };
+                    var role = new Role("Administrator") { Id = 1 };
+                    _dbContext.Users.Add(user);
+                    _dbContext.Roles.Add(role);
+                    user.Roles.Add(role);
+                    role.Users.Add(user);
+                    dbContext.SaveChanges();
+                }
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
         }
 
         public async void SignIn(HttpContext httpContext, string username, string password, bool isPersistent = false)

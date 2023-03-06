@@ -108,10 +108,8 @@ namespace PluginLoader
             Dictionary<T, Type?> plugins = new();
             Type interfaceType = typeof(T);
 
-
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
             var types = assemblies.SelectMany(x => x.GetTypes());
-
 
             //get all possible plugin types
             var pluginImplementations = types.Where(x => interfaceType.IsAssignableFrom(x) && x.IsClass);

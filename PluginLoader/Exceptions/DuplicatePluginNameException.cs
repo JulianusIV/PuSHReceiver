@@ -14,4 +14,3 @@
             => PluginName = name;
     }
 }
-

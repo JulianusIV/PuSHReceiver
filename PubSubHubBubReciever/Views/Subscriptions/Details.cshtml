@@ -1,0 +1,85 @@
+﻿@using Models;
+@{
+    ViewData["Title"] = "Subscription Details";
+}
+@model Lease
+
+<div class="w-75">
+    <h2>@ViewData["Title"]</h2>
+    <br />
+    <div class="row mb-2">
+        <label class="col-2">Id: </label>
+        <p class="col">@Model.Id</p>
+    </div>
+    <div class="row mb-2">
+        <label class="col-2">Name: </label>
+        <p class="col">@Model.DisplayName</p>
+    </div>
+    <div class="row mb-2">
+        <label class="col-2">TopicUrl: </label>
+        <p class="col">@Model.TopicUrl</p>
+    </div>
+    <div class="row mb-2">
+        <label class="col-2">HubUrl: </label>
+        <p class="col">@Model.HubUrl</p>
+    </div>
+    <div class="row mb-2">
+        <label class="col-2">Active: </label>
+        <p class="col">@Model.Active</p>
+    </div>
+    <div class="row mb-2">
+        <label class="col-2">Publisher: </label>
+        <p class="col">@Model.Publisher</p>
+    </div>
+    <div class="row mb-2">
+        <label class="col-2">Consumer: </label>
+        <p class="col">@Model.Consumer</p>
+    </div>
+    
+    <div>
+        <br />
+        <h5>Subscription Status</h5>
+        <br />
+    </div>
+    <div class="row mb-2">
+        <label class="col-2">Subscribed: </label>
+        <p class="col">@Model.Subscribed</p>
+    </div>
+    @if (Model.Subscribed)
+    {
+        <div class="row mb-2">
+            <label class="col-2">Lease duration: </label>
+            <p class="col">@Model.LeaseTime</p>
+        </div>
+            <div class="row mb-2">
+        <label class="col-2">Subscribed: </label>
+            <p class="col">@Model.Subscribed</p>
+        </div>
+    }
+
+    <div>
+        <br />
+        <h5>Plugins</h5>
+        <br />
+    </div>
+    <div class="row mb-2">
+        <label class="col-2">Publisher: </label>
+        <p class="col">@Model.Publisher</p>
+    </div>
+    <div class="row mb-2">
+        <label class="col-2">Consumer: </label>
+        <p class="col">@Model.Consumer</p>
+    </div>
+    <div class="row mb-2">
+        <label class="col-2">Publisher Data: </label>
+        <p class="col">@Model.PublisherData</p>
+    </div>
+    <div class="row mb-2">
+        <label class="col-2">Consumer Data: </label>
+        <p class="col">@Model.ConsumerData</p>
+    </div>
+    <div>
+        <button type="button" class="btn btn-primary" onclick="location.href='@Url.Action("Dashboard", "Subscriptions")'">Back</button>
+        <button type="button" class="btn btn-outline-danger" onclick="location.href='@Url.Action("Delete", "Subscriptions", new { @id = Model.Id })'">Delete</button>
+    </div>
+</div>

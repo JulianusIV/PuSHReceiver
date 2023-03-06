@@ -18,9 +18,9 @@ namespace Models
         public string Consumer { get; set; } = "Default_YoutubeConsumer";
         public User? Owner { get; set; }
         [Column(TypeName = "json")]
-        public string PublisherData { get; set; } = string.Empty;
+        public string PublisherData { get; set; } = "{}";
         [Column(TypeName = "json")]
-        public string ConsumerData { get; set; } = string.Empty;
+        public string ConsumerData { get; set; } = "{}";
 
         public Lease(string displayName, string topicUrl)
         {
@@ -29,6 +29,11 @@ namespace Models
                 throw new ArgumentNullException(nameof(topicUrl));
             TopicUrl = topicUrl;
         }
+
+        [Obsolete("Use ctor with displayName and topicUrl parameters instead")]
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+        public Lease() { }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
         public void UpdateLeaseRecieved(bool subscribe, int leaseTime = 0)
         {

@@ -14,7 +14,11 @@ namespace PubSubHubBubReciever.Controllers
         }
 
         public IActionResult Login()
-            => View();
+        {
+            if (User.Identity is not null && User.Identity.IsAuthenticated)
+                return RedirectToAction("Dashboard", "Subscriptions");
+            return View();
+        }
 
         public IActionResult Logout()
         {
@@ -30,7 +34,7 @@ namespace PubSubHubBubReciever.Controllers
             try
             {
                 _userRepository.SignIn(HttpContext, form.Username, form.Password);
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Dashboard", "Subscriptions");
             }
             catch (Exception ex)
             {

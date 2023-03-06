@@ -102,5 +102,61 @@ namespace Repositories
                 _semaphore.Release();
             }
         }
+
+        public void CreateLease(Lease lease)
+        {
+            _semaphore.Wait();
+
+            try
+            {
+                lease.Owner = lease.Owner is null ? null : _dbContext.Users.First(x => x.Id == lease.Owner.Id);
+                _dbContext.Leases.Add(lease);
+                _dbContext.SaveChanges();
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+        }
+
+        public void UpdateLease(Lease lease)
+        {
+            _semaphore.Wait();
+
+            try
+            {
+                var old = _dbContext.Leases.First(x => x.Id == lease.Id);
+
+                old.DisplayName = lease.DisplayName;
+                old.TopicUrl = lease.TopicUrl;
+                old.HubUrl = lease.HubUrl;
+                old.Active = lease.Active;
+                old.Publisher = lease.Publisher;
+                old.Consumer = lease.Consumer;
+                old.PublisherData = lease.PublisherData;
+                old.ConsumerData = lease.ConsumerData;
+
+                _dbContext.SaveChanges();
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+        }
+
+        public void DeleteLease(int id)
+        {
+            _semaphore.Wait();
+
+            try
+            {
+                _dbContext.Leases.Remove(_dbContext.Leases.First(x => x.Id == id));
+                _dbContext.SaveChanges();
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+        }
     }
 }

@@ -2,10 +2,9 @@
 using Contracts.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Models;
+using PluginLibrary.Interfaces;
 using System.Security.Claims;
-using System.Security.Policy;
 
 namespace PubSubHubBubReciever.Controllers
 {
@@ -24,7 +23,7 @@ namespace PubSubHubBubReciever.Controllers
         }
 
         public IActionResult Index()
-            => RedirectToAction("Subscriptions", "Dashboard");
+            => RedirectToAction("Dashboard", "Subscriptions");
 
         public IActionResult Dashboard()
         {
@@ -46,19 +45,63 @@ namespace PubSubHubBubReciever.Controllers
             return View(new Lease("Subscription1", @"https://www.youtube.com/xml/feeds/videos.xml?channel_id=my_channel_id"));
         }
 
+        [HttpPost]
+        public IActionResult Create(Lease lease)
+        {
+            lease.Owner = _userRepo.GetUser(Convert.ToInt32(User.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value));
+
+            _leaseRepo.CreateLease(lease);
+
+            if (lease.Active)
+                _pluginManager.ResolvePlugin<IConsumerPlugin>(lease.Consumer)
+                    .SubscribeAsync(lease);
+
+            return RedirectToAction("Dashboard", "Subscriptions");
+        }
+
         public IActionResult Edit(int id)
         {
-            throw new NotImplementedException();
+            var publisherNames = _pluginManager.GetPublisherNames();
+            var consumerNames = _pluginManager.GetConsumerNames();
+
+            ViewBag.Publishers = publisherNames;
+            ViewBag.Consumers = consumerNames;
+
+            var lease = _leaseRepo.FindLease(id);
+
+            return View(lease);
+        }
+
+        [HttpPost]
+        public IActionResult Edit(Lease lease)
+        {
+            var before = _leaseRepo.FindLease(lease.Id);
+            _leaseRepo.UpdateLease(lease);
+
+            if (before!.Active != lease.Active)
+                _pluginManager.ResolvePlugin<IConsumerPlugin>(lease.Consumer)
+                    .SubscribeAsync(lease, lease.Active);
+
+            return RedirectToAction("Dashboard", "Subscriptions");
         }
 
         public IActionResult Details(int id)
         {
-            throw new NotImplementedException();
+            var lease = _leaseRepo.FindLease(id);
+
+            return View(lease);
         }
 
         public IActionResult Delete(int id)
         {
-            throw new NotImplementedException();
+            var lease = _leaseRepo.FindLease(id)!;
+            if (lease.Active)
+                _pluginManager.ResolvePlugin<IConsumerPlugin>(lease.Consumer)
+                    .SubscribeAsync(lease, false);
+
+            _leaseRepo.DeleteLease(id);
+
+            return RedirectToAction("Dashboard", "Subscriptions");
         }
     }
 }

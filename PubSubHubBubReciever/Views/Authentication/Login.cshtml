@@ -2,10 +2,15 @@
     ViewData["Title"] = "Login";
 }
 @model LoginModel
-<h1>@ViewData["Title"]</h1>
 
 <form method="post">
-    <input name="Username" />
-    <input type="password" name="Password" />
-    <input type="submit" value="Login"/>
+    <h2 class="mb-3">Login</h2>
+
+    <div class="mb-3">
+        <input name="Username" class="form-control" placeholder="Username" />
+    </div>
+    <div class="mb-3">
+        <input type="password" class="form-control" name="Password" placeholder="Password" />
+    </div>
+    <button type="submit" class="btn btn-primary">Login</button>
 </form>

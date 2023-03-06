@@ -1,0 +1,51 @@
+﻿@using Models;
+@{
+    ViewData["Title"] = "Create Subscription";
+}
+@model Lease
+<h1>@ViewData["Title"]</h1>
+
+<form method="post">
+    <p>
+        <div class="flex-column">
+            <div>
+                <label class="w-25">Name: </label>
+                <input class="w-25" type="text" value="@Model.DisplayName" />
+            </div>
+            <div>
+                <label class="w-25">TopicUrl: </label>
+                <input class="w-50" type="text" value="@Model.TopicUrl" />
+            </div>
+            <div>
+                <label class="w-25">HubUrl: </label>
+                <input class="w-50" type="text" value="@Model.HubUrl" />
+            </div>
+            <div>
+                <label class="w-25">Active: </label>
+                <input type="checkbox" value="@Model.Active" />
+            </div>
+            <div>
+                <label class="w-25">Publisher: </label>
+                <select class="w-25" asp-for="@Model.Publisher">
+                    @foreach (var item in ViewBag.Publishers)
+                    {
+                        <option value="@item">@item</option>
+                    }
+                </select>
+            </div>
+            <div>
+                <label class="w-25">Consumer: </label>
+                <select class="w-25" asp-for="@Model.Consumer">
+                    @foreach (var item in ViewBag.Consumers)
+                    {
+                            <option value="@item">@item</option>
+                    }
+                </select>
+            </div>
+            <div>
+                <br />
+                <input type="submit" value="Create"/>
+            </div>
+        </div>
+    </p>
+</form>

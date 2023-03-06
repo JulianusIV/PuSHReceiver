@@ -1,0 +1,42 @@
+﻿@using Models;
+@{
+    ViewData["Title"] = "Dashboard";
+}
+@model IEnumerable<Lease>
+<h1>@ViewData["Title"]</h1>
+
+
+<p>@Html.ActionLink("Create New", "Create")</p>
+
+<table class="table table-dark table-primary">
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>TopicUrl</th>
+        <th>HubUrl</th>
+        <th>Last Lease</th>
+        <th>Subscribed</th>
+        <th>Active</th>
+        <th>Publisher</th>
+        <th>Consumer</th>
+        <th></th>
+    </tr>
+    @foreach(var item in Model)
+    {
+        <tr>
+            <td>@Html.DisplayFor(modelItem => item.Id)</td>
+            <td>@Html.DisplayFor(modelItem => item.DisplayName)</td>
+            <td>@Html.DisplayFor(modelItem => item.TopicUrl)</td>
+            <td>@Html.DisplayFor(modelItem => item.HubUrl)</td>
+            <td>@Html.DisplayFor(modelItem => item.LastLease)</td>
+            <td>@Html.DisplayFor(modelItem => item.LeaseTime)</td>
+            <td>@Html.DisplayFor(modelItem => item.Subscribed)</td>
+            <td>@Html.DisplayFor(modelItem => item.Publisher)</td>
+            <td>@Html.DisplayFor(modelItem => item.Consumer)</td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
+                @Html.ActionLink("Details", "Details", new { id = item.Id })
+            </td>
+        </tr>
+    }
+</table>

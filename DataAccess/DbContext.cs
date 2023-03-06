@@ -17,6 +17,7 @@ namespace DataAccess
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Lease>().Navigation(e => e.Owner).AutoInclude();
             modelBuilder.Entity<User>().Navigation(e => e.Roles).AutoInclude();
         }
 

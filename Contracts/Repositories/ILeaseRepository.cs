@@ -8,6 +8,7 @@ namespace Contracts.Repositories
         public IEnumerable<Lease> GetActiveExpiredLeases();
         public IEnumerable<Lease> GetRunningLeases();
         public IEnumerable<Lease> GetSubscribedLeases();
+        public IEnumerable<Lease> GetLeasesByUser(User owner);
         public int CountSubscribedLeases();
     }
 }

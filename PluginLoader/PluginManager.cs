@@ -172,5 +172,11 @@ namespace PluginLoader
                 });
             }
         }
+
+        public IEnumerable<string> GetPublisherNames() 
+            => _publisherPlugins.Keys.Select(x => x.Name);
+
+        public IEnumerable<string> GetConsumerNames()
+            => _consumerPlugins.Keys.Select(x => x.Name);
     }
 }

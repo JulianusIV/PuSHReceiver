@@ -6,7 +6,7 @@ namespace PubSubHubBubReciever.Controllers
 {
     public class AuthenticationController : Controller
     {
-        IUserRepository _userRepository;
+        private readonly IUserRepository _userRepository;
 
         public AuthenticationController(IUserRepository userRepository)
         {
@@ -14,9 +14,7 @@ namespace PubSubHubBubReciever.Controllers
         }
 
         public IActionResult Login()
-        {
-            return View();
-        }
+            => View();
 
         public IActionResult Logout()
         {

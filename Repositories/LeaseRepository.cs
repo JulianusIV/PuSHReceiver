@@ -88,5 +88,19 @@ namespace Repositories
                 _semaphore.Release();
             }
         }
+
+        public IEnumerable<Lease> GetLeasesByUser(User owner)
+        {
+            _semaphore.Wait();
+
+            try
+            {
+                return _dbContext.Leases.Where(x => x.Owner != null && x.Owner.Id == owner.Id);
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+        }
     }
 }

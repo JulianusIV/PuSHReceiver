@@ -107,5 +107,19 @@ namespace Repositories
             var inputHash = Rfc2898DeriveBytes.Pbkdf2(input, salt, iterations, algorithm, hash.Length);
             return CryptographicOperations.FixedTimeEquals(inputHash, hash);
         }
+
+        public User GetUser(int id)
+        {
+            _semaphore.Wait();
+
+            try
+            {
+                return _dbContext.Users.First(x => x.Id == id);
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+        }
     }
 }

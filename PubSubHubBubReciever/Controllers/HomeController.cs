@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using PubSubHubBubReciever.Models;
 using System.Diagnostics;
 
@@ -14,21 +13,14 @@ namespace PubSubHubBubReciever.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
+        public IActionResult Index() 
+            => View();
 
-        [Authorize(Policy = "AdminOnly")]
-        public IActionResult Privacy()
-        {
-            return View();
-        }
+        public IActionResult Privacy() 
+            => View();
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+        public IActionResult Error() 
+            => View(new ErrorModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
 }

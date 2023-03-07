@@ -21,6 +21,7 @@ namespace Service
 
         public void Shutdown()
         {
+            //if any leases are subscribed, unsubscribe, then wait for cancellation token
             if (_leaseRepository.CountSubscribedLeases() > 0)
             {
                 _isShutdownRequested = true;

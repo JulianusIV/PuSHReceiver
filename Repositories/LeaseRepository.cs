@@ -109,6 +109,7 @@ namespace Repositories
 
             try
             {
+                //fetch owner from DB to not create duplicate user
                 lease.Owner = lease.Owner is null ? null : _dbContext.Users.First(x => x.Id == lease.Owner.Id);
                 _dbContext.Leases.Add(lease);
                 _dbContext.SaveChanges();

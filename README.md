@@ -1,6 +1,6 @@
 [![CodeQL](https://github.com/JulianusIV/PubSubHubBubReciever/actions/workflows/codeql-analysis.yml/badge.svg?branch=master)](https://github.com/JulianusIV/PubSubHubBubReciever/actions/workflows/codeql-analysis.yml)
 [![Docker Image CI](https://github.com/JulianusIV/PubSubHubBubReciever/actions/workflows/docker-ci.yml/badge.svg?branch=master)](https://github.com/JulianusIV/PubSubHubBubReciever/actions/workflows/docker-ci.yml)
-[![CodeFactor](https://www.codefactor.io/repository/github/julianusiv/pubsubhubbubreciever/badge)](https://www.codefactor.io/repository/github/julianusiv/pubsubhubbubreciever)
+[![CodeFactor](https://www.codefactor.io/repository/github/julianusiv/pushreceiver/badge)](https://www.codefactor.io/repository/github/julianusiv/pushreceiver)
 [![Run MSTest](https://github.com/JulianusIV/PubSubHubBubReciever/actions/workflows/run-mstest.yml/badge.svg)](https://github.com/JulianusIV/PubSubHubBubReciever/actions/workflows/run-mstest.yml)
 
 # PubSubHubBubReciever

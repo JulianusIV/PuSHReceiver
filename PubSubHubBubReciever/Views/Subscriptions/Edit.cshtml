@@ -1,0 +1,49 @@
+﻿@using Models;
+@{
+    ViewData["Title"] = "Edit Subscription";
+}
+@model Lease
+
+<form method="post" class="w-75">
+    <h2>@ViewData["Title"]</h2>
+    @Html.HiddenFor(input => Model.Id)
+    <div class="row mb-2">
+        <label class="col-2">Name: </label>
+        <input class="col-2 align-content-center" asp-for="@Model.DisplayName" type="text" value="@Model.DisplayName" />
+    </div>
+    <div class="row mb-2">
+        <label class="col-2">TopicUrl: </label>
+        <input class="col-7" asp-for="@Model.TopicUrl" type="text" value="@Model.TopicUrl" />
+    </div>
+    <div class="row mb-2">
+        <label class="col-2">HubUrl: </label>
+        <input class="col-7" asp-for="@Model.HubUrl" type="text" value="@Model.HubUrl" />
+    </div>
+    <div class="row mb-2">
+        <label class="col-2">Active: </label>
+        @Html.CheckBoxFor(input => Model.Active, new { @class = "col-1" })
+    </div>
+    <div class="row mb-2">
+        <label class="col-2">Publisher: </label>
+        <select class="col-3" asp-for="@Model.Publisher">
+            @foreach (var item in ViewBag.Publishers)
+            {
+                <option value="@item">@item</option>
+            }
+        </select>
+    </div>
+    <div class="row mb-2">
+        <label class="col-2">Consumer: </label>
+        <select class="col-3" asp-for="@Model.Consumer">
+            @foreach (var item in ViewBag.Consumers)
+            {
+                <option value="@item">@item</option>
+            }
+        </select>
+    </div>
+    @Html.HiddenFor(input => Model.PublisherData)
+    @Html.HiddenFor(input => Model.ConsumerData)
+    <div>
+        <input type="submit" value="Save" />
+    </div>
+</form>

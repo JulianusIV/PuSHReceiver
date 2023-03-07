@@ -1,13 +1,17 @@
-﻿namespace DefaultPlugins.YouTubeConsumer
+﻿using System.ComponentModel;
+using System.Xml.Serialization;
+
+namespace DefaultPlugins.YouTubeConsumer
 {
 #pragma warning disable IDE1006
 #pragma warning disable CS8618
+#pragma warning disable CS8981
     // NOTE: Generated code may require at least .NET Framework 4.5 or .NET Core/Standard 2.0.
     /// <remarks/>
-    [System.SerializableAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.w3.org/2005/Atom")]
-    [System.Xml.Serialization.XmlRootAttribute(Namespace = "http://www.w3.org/2005/Atom", IsNullable = false)]
+    [Serializable()]
+    [DesignerCategory("code")]
+    [XmlType(AnonymousType = true, Namespace = "http://www.w3.org/2005/Atom")]
+    [XmlRoot(Namespace = "http://www.w3.org/2005/Atom", IsNullable = false)]
     public partial class feed
     {
 
@@ -15,12 +19,12 @@
 
         private string titleField;
 
-        private System.DateTime updatedField;
+        private DateTime updatedField;
 
         private feedEntry entryField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("link")]
+        [XmlElement("link")]
         public feedLink[] link
         {
             get
@@ -47,7 +51,7 @@
         }
 
         /// <remarks/>
-        public System.DateTime updated
+        public DateTime updated
         {
             get
             {
@@ -74,9 +78,9 @@
     }
 
     /// <remarks/>
-    [System.SerializableAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.w3.org/2005/Atom")]
+    [Serializable()]
+    [DesignerCategory("code")]
+    [XmlType(AnonymousType = true, Namespace = "http://www.w3.org/2005/Atom")]
     public partial class feedLink
     {
 
@@ -85,7 +89,7 @@
         private string hrefField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [XmlAttribute()]
         public string rel
         {
             get
@@ -99,7 +103,7 @@
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [XmlAttribute()]
         public string href
         {
             get
@@ -114,9 +118,9 @@
     }
 
     /// <remarks/>
-    [System.SerializableAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.w3.org/2005/Atom")]
+    [Serializable()]
+    [DesignerCategory("code")]
+    [XmlType(AnonymousType = true, Namespace = "http://www.w3.org/2005/Atom")]
     public partial class feedEntry
     {
 
@@ -132,9 +136,9 @@
 
         private feedEntryAuthor authorField;
 
-        private System.DateTime publishedField;
+        private DateTime publishedField;
 
-        private System.DateTime updatedField;
+        private DateTime updatedField;
 
         /// <remarks/>
         public string id
@@ -150,7 +154,7 @@
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace = "http://www.youtube.com/xml/schemas/2015")]
+        [XmlElement(Namespace = "http://www.youtube.com/xml/schemas/2015")]
         public string videoId
         {
             get
@@ -164,7 +168,7 @@
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace = "http://www.youtube.com/xml/schemas/2015")]
+        [XmlElement(Namespace = "http://www.youtube.com/xml/schemas/2015")]
         public string channelId
         {
             get
@@ -217,7 +221,7 @@
         }
 
         /// <remarks/>
-        public System.DateTime published
+        public DateTime published
         {
             get
             {
@@ -230,7 +234,7 @@
         }
 
         /// <remarks/>
-        public System.DateTime updated
+        public DateTime updated
         {
             get
             {
@@ -244,9 +248,9 @@
     }
 
     /// <remarks/>
-    [System.SerializableAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.w3.org/2005/Atom")]
+    [Serializable()]
+    [DesignerCategory("code")]
+    [XmlType(AnonymousType = true, Namespace = "http://www.w3.org/2005/Atom")]
     public partial class feedEntryLink
     {
 
@@ -255,7 +259,7 @@
         private string hrefField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [XmlAttribute()]
         public string rel
         {
             get
@@ -269,7 +273,7 @@
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [XmlAttribute()]
         public string href
         {
             get
@@ -284,9 +288,9 @@
     }
 
     /// <remarks/>
-    [System.SerializableAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.w3.org/2005/Atom")]
+    [Serializable()]
+    [DesignerCategory("code")]
+    [XmlType(AnonymousType = true, Namespace = "http://www.w3.org/2005/Atom")]
     public partial class feedEntryAuthor
     {
 
@@ -320,6 +324,7 @@
             }
         }
     }
+#pragma warning restore CS8981
 #pragma warning restore CS8618
 #pragma warning restore IDE1006
 }

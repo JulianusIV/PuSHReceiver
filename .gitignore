@@ -271,3 +271,4 @@ Bulklog.txt
 /PubSubHubBubReciever/leases.json
 /PubSubHubBubReciever/data.json
 settings.runsettings
+/PubSubHubBubReciever/settings.ini

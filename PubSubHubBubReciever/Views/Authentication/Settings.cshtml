@@ -1,0 +1,23 @@
+﻿@using PuSHReceiver.Models;
+@{
+    ViewData["Title"] = "Account Settings";
+}
+@model UserModel
+
+<form method="post">
+    <h2 class="mb-3">Account Settings</h2>
+    @Html.HiddenFor(input => Model.Id)
+    <div class="row mb-3">
+        <label class="col">Username:</label>
+        <input class="col" asp-for="@Model.Username" />
+    </div>
+    <div class="row mb-3">
+        <label class="col">Password:</label>
+        <input type="password" class="col" asp-for="@Model.Password" placeholder="*****" />
+    </div>
+    <div class="row mb-3">
+        <label class="col">Confirm Password:</label>
+        <input type="password" class="col" asp-for="@Model.ConfirmPassword" placeholder="*****" />
+    </div>
+    <input type="submit" value="Speichern" />
+</form>

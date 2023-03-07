@@ -1,0 +1,48 @@
+﻿@using Models;
+@{
+    ViewData["Title"] = "Dashboard";
+}
+@model IEnumerable<Lease>
+
+<div class="table">
+    <h2>@ViewData["Title"]</h2>
+
+    <button type="button" class="btn btn-success" onclick="location.href='@Url.Action("Create", "Subscriptions")'">Create New</button>
+    
+    <table class="table table-dark table-primary">
+        <thead>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Name</th>
+                <th scope="col">TopicUrl</th>
+                <th scope="col">HubUrl</th>
+                <th scope="col">Last Lease</th>
+                <th scope="col">Subscribed</th>
+                <th scope="col">Active</th>
+                <th scope="col">Publisher</th>
+                <th scope="col">Consumer</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <th scope="row">@Html.DisplayFor(modelItem => item.Id)</th>
+                    <td>@Html.DisplayFor(modelItem => item.DisplayName)</td>
+                    <td>@Html.DisplayFor(modelItem => item.TopicUrl)</td>
+                    <td>@Html.DisplayFor(modelItem => item.HubUrl)</td>
+                    <td>@Html.DisplayFor(modelItem => item.LastLease)</td>
+                    <td>@Html.DisplayFor(modelItem => item.LeaseTime)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Subscribed)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Publisher)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Consumer)</td>
+                    <td>
+                        <button type="button" class="btn btn-outline-warning" onclick="location.href='@Url.Action("Edit", "Subscriptions", new { @id = item.Id})'">Edit</button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="location.href='@Url.Action("Details", "Subscriptions", new { @id = item.Id})'">Details</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

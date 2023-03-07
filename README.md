@@ -1,5 +1,7 @@
 [![CodeQL](https://github.com/JulianusIV/PubSubHubBubReciever/actions/workflows/codeql-analysis.yml/badge.svg?branch=master)](https://github.com/JulianusIV/PubSubHubBubReciever/actions/workflows/codeql-analysis.yml)
 [![Docker Image CI](https://github.com/JulianusIV/PubSubHubBubReciever/actions/workflows/docker-ci.yml/badge.svg?branch=master)](https://github.com/JulianusIV/PubSubHubBubReciever/actions/workflows/docker-ci.yml)
+[![CodeFactor](https://www.codefactor.io/repository/github/julianusiv/pubsubhubbubreciever/badge)](https://www.codefactor.io/repository/github/julianusiv/pubsubhubbubreciever)
+[![Run MSTest](https://github.com/JulianusIV/PubSubHubBubReciever/actions/workflows/run-mstest.yml/badge.svg)](https://github.com/JulianusIV/PubSubHubBubReciever/actions/workflows/run-mstest.yml)
 
 # PubSubHubBubReciever
 
@@ -7,7 +9,7 @@
 
 ## Why?
 
-There are many Solutions to forward YouTube notifications to Webhooks, like [IFTTT](https://ifttt.com/) or [Zapier](https://zapier.com/), however these have to poll the YouTube API which is not only slow (if the video is published right after one polling run it can take up to an hour until the webhook is executed), but can also cause problems like exceeding quota limits. This is using a service provided by Google, that only requires communication between the servers once on startup, once every time the lease is renewed, and whenever an item is added to the feed. That makes this incredibly fast (outside of failures in this reciever the slowest case was somewhere around 30 seconds) and doesn't constantly take up network resources, or eat away on quota.
+There are many Solutions to forward YouTube notifications to Webhooks, like [IFTTT](https://ifttt.com/) or [Zapier](https://zapier.com/), however these have to poll the YouTube API, which is either slow (for example IFTTT polls the API once every hour to preserve quota, so if the video is published right after one polling run it can take up to an hour until the webhook is executed), or can cause problems like exceeding quota limits. This application is using a service provided by Google, that only requires communication between the servers once on startup, once every time the lease is renewed (typically 5 days), and whenever an item is added to the feed. That makes it incredibly fast (outside of failures in this reciever the slowest case was somewhere around 30 seconds) and doesn't constantly take up network resources, or eat away on quota.
 
 ## How does it work?
 
@@ -22,19 +24,18 @@ Whenever a new item is added to the feed the hub sends an HTTP-POST, which is ag
 
 ### Setup
 
-Currently, this is in early development, so I cannot give any guarantee on stability, and any changeset might break at any time.
+Currently, this is in development, so I cannot give any guarantee on stability, and any changeset might break at any time.
 If you want to set this up on your own Server anyway, you can either find the latest commit on [Docker Hub](https://hub.docker.com/r/julianusiv/pubsubhubbubreciever/tags), or you can build this repository yourself (I will be setting up releases in the future as well) and run the executable on your server.
 
 If you want to run this with Docker you can either use run:
 
 ```sh
 docker run --name=PuSHReciever \
-  -e "CALLBACKURL=https://mydomain.example.com/Reciever" \
-  -e "CONNECTIONSTRING=server=localhost;database=example;user=example;password=example;Convert Zero Datetime=True" \
-  -e "LOADDEFAULTPLUGINS=true" \
+  -v &PWD/settings.ini:/app/settings.ini
   -v $PWD/Plugins:/app/Plugins \
- -d julianusiv/pubsubhubbubreciever:latest
+  -d julianusiv/pubsubhubbubreciever:latest
 ```
+but remember that you have to run a mysql container aswell
 
 or use a compose file similar to this:
 
@@ -46,15 +47,12 @@ services:
     restart: unless-stopped
     volumes:
       - ./Plugins:/app/Plugins
+      - ./settings.ini:/app/settings.ini
     depends_on:
       - db
     ports:
-      - '80:80'
-    environment:
-      CALLBACKURL: "https://mydomain.example.com/Reciever"
-      # push_db_1 here depends on your folder structure, if you have this in a folder in your home called "push" you can just leave this in
-      CONNECTIONSTRING: "server=push_db_1;database=example;user=example;password=example;Convert Zero Datetime=True"
-      LOADDEFAULTPLUGINS: "true"
+      - '80:80' #omit in prod and route traffic internally instead
+
   db:
     image: "mysql"
     restart: unless-stopped
@@ -75,4 +73,8 @@ As you might have noticed this also needs a Domain for the Callback URL, and sin
 
 ### Usage
 
-On the first run the program will add the ``leases`` table in your database that you currently have to insert valid data into. Soon this process will be done by a control panel hosted as a website.
+On the first run the program will set up the database for you, you can then log in to the dashboard at localhost:80 with the default user and password "Admin" and "Nimda". There you can create, edit and delete leases.
+
+IF YOU ARE RUNNING THIS IN DOCKER DO NOT SIMPLY SHUT DOWN THE CONTAINER
+Use the shutdown button on the webpanel instead, this will ensure all subscriptions are properly unsubscribed.
+If you are running this in CLI you can just use ctrl + c.

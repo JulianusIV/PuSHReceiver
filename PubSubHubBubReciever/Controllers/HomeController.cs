@@ -1,10 +1,10 @@
 ﻿using Contracts.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PubSubHubBubReciever.Models;
+using PuSHReceiver.Models;
 using System.Diagnostics;
 
-namespace PubSubHubBubReciever.Controllers
+namespace PuSHReceiver.Controllers
 {
     public class HomeController : Controller
     {

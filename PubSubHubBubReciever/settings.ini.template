@@ -1,0 +1,8 @@
+﻿[web]
+callbackurl = "https://example.url.net/Reciever"
+
+[database]
+connectionstring = "server=localhost:3306;database=example;user=example;password=example;Convert Zero Datetime=True"
+
+[plugins]
+usedefaultplugins = true

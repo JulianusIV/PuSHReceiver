@@ -6,7 +6,7 @@ using Models;
 using PluginLibrary.Interfaces;
 using System.Security.Claims;
 
-namespace PubSubHubBubReciever.Controllers
+namespace PuSHReceiver.Controllers
 {
     [Authorize]
     public class SubscriptionsController : Controller

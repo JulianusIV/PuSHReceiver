@@ -6,7 +6,7 @@
 
 <form method="post" class="w-75">
     <h2>@ViewData["Title"]</h2>
-
+    @Html.HiddenFor(input => Model.Id)
     <div class="row mb-2">
         <label class="col-2">Name: </label>
         <input class="col-2 align-content-center" asp-for="@Model.DisplayName" type="text" value="@Model.DisplayName" />
@@ -41,6 +41,8 @@
             }
         </select>
     </div>
+    @Html.HiddenFor(input => Model.PublisherData)
+    @Html.HiddenFor(input => Model.ConsumerData)
     <div>
         <input type="submit" value="Save" />
     </div>

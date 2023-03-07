@@ -9,7 +9,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="7.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="7.0.3" />
   </ItemGroup>
 
   <ItemGroup>

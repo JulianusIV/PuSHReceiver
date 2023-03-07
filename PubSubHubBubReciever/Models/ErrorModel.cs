@@ -1,4 +1,4 @@
-﻿namespace PubSubHubBubReciever.Models
+﻿namespace PuSHReceiver.Models
 {
     public class ErrorModel
     {

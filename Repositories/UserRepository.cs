@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Models;
 using System.Security.Claims;
 using System.Security.Cryptography;
-using System.Linq;
 
 namespace Repositories
 {
@@ -32,7 +31,7 @@ namespace Repositories
             return claims;
         }
 
-        private static IEnumerable<Claim> GetUserRoleClaims(User user) 
+        private static IEnumerable<Claim> GetUserRoleClaims(User user)
             => user.Roles.Select(role => new Claim(ClaimTypes.Role, role.Name));
 
         private static string Hash(string input)
@@ -70,7 +69,7 @@ namespace Repositories
                 if (!_dbContext.Users.Any())
                 {
                     //seed data
-                    var user = new User("Admin", "5F23E4F71C3C727AB02B49793EF10A9F2FBD98B62562D658AB585CB399BE23DB:87513C55EB8463A4FFC056E06F612013:100000:SHA256") { Id = 1 };
+                    var user = new User("Admin", "85A26076BE2B2A20BE53E548F4B0B1C19E1CFD4682F7922F5A5921BA7C840EF1:A6F1247D796006FBCD1C86052B218709:100000:SHA256") { Id = 1 };
                     var role = new Role("Administrator") { Id = 1 };
                     _dbContext.Users.Add(user);
                     _dbContext.Roles.Add(role);
@@ -136,6 +135,27 @@ namespace Repositories
                     user.Roles = roles.Select(role => _dbContext.Roles.First(x => role.Id == x.Id)).ToList();
 
                 _dbContext.Users.Add(user);
+
+                _dbContext.SaveChanges();
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+        }
+
+        public void UpdateUser(int id, string username = "", string password = "", List<Role>? roles = null)
+        {
+            _semaphore.Wait();
+
+            try
+            {
+                var user = _dbContext.Users.First(x => x.Id == id);
+
+                if (!string.IsNullOrEmpty(username))
+                    user.UserName = username;
+                if (!string.IsNullOrEmpty(password))
+                    user.PasswordHash = Hash(password);
 
                 _dbContext.SaveChanges();
             }

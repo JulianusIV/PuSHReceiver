@@ -1,9 +1,11 @@
 ﻿using Contracts.Repositories;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PubSubHubBubReciever.Models;
+using PuSHReceiver.Models;
+using System.Security.Claims;
 
-namespace PubSubHubBubReciever.Controllers
+namespace PuSHReceiver.Controllers
 {
     public class AuthenticationController : Controller
     {
@@ -21,10 +23,36 @@ namespace PubSubHubBubReciever.Controllers
             return View();
         }
 
+        [Authorize]
         public IActionResult Logout()
         {
             HttpContext.SignOutAsync();
             return RedirectToAction("Login", "Authentication");
+        }
+
+        [Authorize]
+        [HttpPost]
+        public IActionResult Settings(UserModel model)
+        {
+            if (!string.IsNullOrEmpty(model.Password) && !string.IsNullOrEmpty(model.ConfirmPassword) && model.Password == model.ConfirmPassword)
+            {
+                _userRepository.UpdateUser(model.Id, model.Username, model.Password);
+                
+                HttpContext.SignOutAsync();
+                var claims = _userRepository.GetUserClaims(model.Username, model.Password);
+                HttpContext.SignInAsync(claims!);
+            }
+            return View(model);
+        }
+
+        [Authorize]
+        public IActionResult Settings() 
+        {
+            var user = _userRepository.GetUser(Convert.ToInt32(User.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value));
+
+            var userModel = new UserModel(user.UserName) { Id = user.Id };
+
+            return View(userModel);
         }
 
         [HttpPost]

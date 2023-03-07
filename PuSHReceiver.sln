@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32819.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PubSubHubBubReciever", "PubSubHubBubReciever\PubSubHubBubReciever.csproj", "{A455BF33-E6A8-4415-AF4F-5564290970E5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PuSHReceiver", "PubSubHubBubReciever\PuSHReceiver.csproj", "{A455BF33-E6A8-4415-AF4F-5564290970E5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccess", "DataAccess\DataAccess.csproj", "{1954345E-F6B5-4305-89CE-F8A59B274D61}"
 EndProject

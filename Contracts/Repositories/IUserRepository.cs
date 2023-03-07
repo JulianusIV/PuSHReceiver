@@ -8,5 +8,6 @@ namespace Contracts.Repositories
         public User GetUser(int id);
         public ClaimsPrincipal? GetUserClaims(string username, string password);
         public void CreateUser(string username, string password, List<Role>? roles = null);
+        public void UpdateUser(int id, string username = "", string password = "", List<Role>? roles = null);
     }
 }

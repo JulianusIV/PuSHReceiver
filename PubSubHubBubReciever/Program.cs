@@ -14,7 +14,8 @@ using System.Security.Claims;
 var builder = WebApplication.CreateBuilder(args);
 
 //config shit
-builder.Configuration.AddIniFile("settings.ini");
+builder.Configuration.AddIniFile("settings.ini"); 
+
 var webConfig = builder.Configuration.GetSection("web").Get<Configuration.WebConfig>();
 if (webConfig is not null)
     Configuration.ConfigurationManager.WebConfig = webConfig;

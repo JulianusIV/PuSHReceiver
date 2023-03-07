@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Models.ApiCommunication;
 using PluginLibrary.Interfaces;
 
-namespace PubSubHubBubReciever.Controllers
+namespace PuSHReceiver.Controllers
 {
     [ApiController]
     [Route("[controller]")]

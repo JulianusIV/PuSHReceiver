@@ -37,9 +37,9 @@ namespace Models
 
         public void UpdateLeaseRecieved(bool subscribe, int leaseTime = 0)
         {
-            this.LeaseTime = leaseTime;
-            this.LastLease = DateTime.Now;
-            this.Subscribed = subscribe;
+            LeaseTime = leaseTime;
+            LastLease = DateTime.Now;
+            Subscribed = subscribe;
         }
 
         public T? GetObjectFromPublisherString<T>()

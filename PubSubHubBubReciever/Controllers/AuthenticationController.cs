@@ -1,4 +1,5 @@
 ﻿using Contracts.Repositories;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using PubSubHubBubReciever.Models;
 
@@ -22,7 +23,7 @@ namespace PubSubHubBubReciever.Controllers
 
         public IActionResult Logout()
         {
-            _userRepository.SignOut(HttpContext);
+            HttpContext.SignOutAsync();
             return RedirectToAction("Login", "Authentication");
         }
 
@@ -33,7 +34,11 @@ namespace PubSubHubBubReciever.Controllers
                 return View(form);
             try
             {
-                _userRepository.SignIn(HttpContext, form.Username, form.Password);
+                var claims = _userRepository.GetUserClaims(form.Username, form.Password);
+                if (claims is null)
+                    return View(form);
+
+                HttpContext.SignInAsync(claims).Wait();
                 return RedirectToAction("Dashboard", "Subscriptions");
             }
             catch (Exception ex)

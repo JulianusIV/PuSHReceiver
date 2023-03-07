@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using Models;
-using Models.ApiCommunication;
 using PluginLibrary.Interfaces;
 using PluginLibrary.PluginRepositories;
 using System.Text;
@@ -26,7 +25,7 @@ namespace DefaultPlugins.DiscordPublisher
                 return;
             var jsonString = await File.ReadAllTextAsync("Plugins/DiscordPublisherUrlCache.json");
             var jsonObject = JsonSerializer.Deserialize<Dictionary<int, Queue<string>>>(jsonString);
-            if (jsonObject is null) 
+            if (jsonObject is null)
                 return;
             _lastPublishes = jsonObject;
         }
@@ -64,14 +63,14 @@ namespace DefaultPlugins.DiscordPublisher
             //send request
             using var client = new HttpClient();
             await client.PostAsync(pluginData.WebhookUrl, new StringContent(content, Encoding.UTF8, "application/json"));
-            
+
             lock (_lastPublishes)
             {
                 //save cache
                 if (!Directory.Exists("Plugins"))
                     Directory.CreateDirectory("Plugins");
                 var jsonString = JsonSerializer.Serialize(_lastPublishes);
-                File.WriteAllText("Plugins/DiscordPublisherUrlCache.json", jsonString); 
+                File.WriteAllText("Plugins/DiscordPublisherUrlCache.json", jsonString);
             }
         }
     }

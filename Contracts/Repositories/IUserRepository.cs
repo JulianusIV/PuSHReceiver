@@ -1,12 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
-using Models;
+﻿using Models;
+using System.Security.Claims;
 
 namespace Contracts.Repositories
 {
     public interface IUserRepository
     {
         public User GetUser(int id);
-        public void SignIn(HttpContext httpContext, string username, string password, bool isPersistent = false);
-        public void SignOut(HttpContext httpContent);
+        public ClaimsPrincipal? GetUserClaims(string username, string password);
+        public void CreateUser(string username, string password, List<Role>? roles = null);
     }
 }

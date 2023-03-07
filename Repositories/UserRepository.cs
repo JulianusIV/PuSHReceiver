@@ -1,9 +1,6 @@
 ﻿using Contracts.DbContext;
 using Contracts.Repositories;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 using Models;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -20,58 +17,6 @@ namespace Repositories
 
         private readonly IDbContext _dbContext;
         private readonly SemaphoreSlim _semaphore = new(1);
-
-        public UserRepository(IDbContext dbContext)
-        {
-            _dbContext = dbContext;
-
-            _semaphore.Wait();
-
-            try
-            {
-                if (!_dbContext.Users.Any())
-                {
-                    var user = new User("Admin", "5F23E4F71C3C727AB02B49793EF10A9F2FBD98B62562D658AB585CB399BE23DB:87513C55EB8463A4FFC056E06F612013:100000:SHA256") { Id = 1 };
-                    var role = new Role("Administrator") { Id = 1 };
-                    _dbContext.Users.Add(user);
-                    _dbContext.Roles.Add(role);
-                    user.Roles.Add(role);
-                    role.Users.Add(user);
-                    dbContext.SaveChanges();
-                }
-            }
-            finally
-            {
-                _semaphore.Release();
-            }
-        }
-
-        public async void SignIn(HttpContext httpContext, string username, string password, bool isPersistent = false)
-        {
-            _semaphore.Wait();
-
-            try
-            {
-                var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.UserName == username);
-                if (user is null)
-                    return;
-
-                if (!Verify(password, user.PasswordHash))
-                    return;
-
-                ClaimsIdentity identity = new(GetUserClaims(user), CookieAuthenticationDefaults.AuthenticationScheme);
-                ClaimsPrincipal principal = new(identity);
-
-                await httpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-            }
-            finally
-            {
-                _semaphore.Release();
-            }
-        }
-
-        public async void SignOut(HttpContext httpContext)
-            => await httpContext.SignOutAsync();
 
         private static IEnumerable<Claim> GetUserClaims(User user)
         {
@@ -108,6 +53,53 @@ namespace Repositories
             return CryptographicOperations.FixedTimeEquals(inputHash, hash);
         }
 
+        public UserRepository(IDbContext dbContext)
+        {
+            _dbContext = dbContext;
+
+            _semaphore.Wait();
+
+            try
+            {
+                if (!_dbContext.Users.Any())
+                {
+                    var user = new User("Admin", "5F23E4F71C3C727AB02B49793EF10A9F2FBD98B62562D658AB585CB399BE23DB:87513C55EB8463A4FFC056E06F612013:100000:SHA256") { Id = 1 };
+                    var role = new Role("Administrator") { Id = 1 };
+                    _dbContext.Users.Add(user);
+                    _dbContext.Roles.Add(role);
+                    user.Roles.Add(role);
+                    role.Users.Add(user);
+                    dbContext.SaveChanges();
+                }
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+        }
+
+        public ClaimsPrincipal? GetUserClaims(string username, string password)
+        {
+            _semaphore.Wait();
+
+            try
+            {
+                var user = _dbContext.Users.FirstOrDefault(x => x.UserName == username);
+                if (user is null)
+                    return null;
+
+                if (string.IsNullOrEmpty(user.PasswordHash) || !Verify(password, user.PasswordHash))
+                    return null;
+
+                ClaimsIdentity identity = new(GetUserClaims(user), CookieAuthenticationDefaults.AuthenticationScheme);
+                return new ClaimsPrincipal(identity);
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+        }
+
         public User GetUser(int id)
         {
             _semaphore.Wait();
@@ -115,6 +107,27 @@ namespace Repositories
             try
             {
                 return _dbContext.Users.First(x => x.Id == id);
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+        }
+
+        public void CreateUser(string username, string password, List<Role>? roles = null)
+        {
+            _semaphore.Wait();
+
+            try
+            {
+                var user = new User(username, Hash(password));
+
+                if (roles is not null)
+                    user.Roles = roles.Select(role => _dbContext.Roles.First(x => role.Id == x.Id)).ToList();
+
+                _dbContext.Users.Add(user);
+
+                _dbContext.SaveChanges();
             }
             finally
             {

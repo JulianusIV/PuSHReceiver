@@ -17,10 +17,10 @@ namespace PubSubHubBubReciever.Controllers
         private readonly IShutdownService _shutdownService;
         private readonly ILeaseService _leaseService;
 
-        public RecieverController(ILogger<RecieverController> logger, 
-            ILeaseRepository repository, 
-            IPluginManager pluginManager, 
-            IShutdownService shutdownService, 
+        public RecieverController(ILogger<RecieverController> logger,
+            ILeaseRepository repository,
+            IPluginManager pluginManager,
+            IShutdownService shutdownService,
             ILeaseService leaseService)
         {
             _logger = logger;
@@ -93,7 +93,7 @@ namespace PubSubHubBubReciever.Controllers
         public IActionResult Post([FromRoute] int topicId)
         {
             _logger.LogDebug("Recieved HTTPPost in {Controller} with TopicId {TopicId}.", nameof(RecieverController), topicId);
-            
+
             //fetch lease with given id from DB
             var topic = _leaseRepository.FindLease(topicId);
             if (topic is null)

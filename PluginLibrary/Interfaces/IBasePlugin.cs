@@ -1,5 +1,5 @@
-﻿using PluginLibrary.PluginRepositories;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
+using PluginLibrary.PluginRepositories;
 
 namespace PluginLibrary.Interfaces
 {

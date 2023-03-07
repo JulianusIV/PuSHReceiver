@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Models;
 using Moq;
+using PluginLibrary.PluginRepositories;
 using Repositories;
 
 namespace RepositoriesTests
@@ -39,7 +40,7 @@ namespace RepositoriesTests
             mockContext.Setup(c => c.Leases).Returns(mockSet.Object);
 
             //create the service and inject the mock context
-            var service = new PluginRepository(mockContext.Object);
+            IPluginRepository service = new PluginRepository(mockContext.Object);
             service.SaveData(lease);
 
             //assert

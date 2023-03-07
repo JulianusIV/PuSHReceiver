@@ -4,7 +4,7 @@ EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
-COPY ["PuSHReceiver/PuSHReceiver.csproj", "PuSHReveiver/"]
+COPY ["PuSHReceiver/PuSHReceiver.csproj", "PuSHReceiver/"]
 COPY ["DataAccess/DataAccess.csproj", "DataAccess/"]
 COPY ["Configuration/Configuration.csproj", "Configuration/"]
 COPY ["Contracts/Contracts.csproj", "Contracts/"]

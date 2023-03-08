@@ -41,6 +41,14 @@
             }
         </select>
     </div>
+    <div class="row mb-2 input-group">
+        <label class="col-2">Publisher Data</label>
+        <textarea class="col-7 ms-1 form-control" placeholder="{}" asp-for="@Model.PublisherData" style="border-top-left-radius: 0.25rem; border-bottom-left-radius: 0.25rem;"></textarea>
+    </div>
+    <div class="row mb-2 input-group">
+        <label class="col-2">Consumer Data</label>
+        <textarea class="col-7 ms-1 form-control" placeholder="{}" asp-for="@Model.ConsumerData" style="border-top-left-radius: 0.25rem; border-bottom-left-radius: 0.25rem;"></textarea>
+    </div>
     <div>
         <input type="submit" class="btn btn-primary mt-3" value="Create" />
     </div>

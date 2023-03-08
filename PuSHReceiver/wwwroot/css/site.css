@@ -19,7 +19,6 @@ main {
     flex-wrap: nowrap;
     height: 100vh;
     max-height: 100vh;
-    overflow-x: auto;
 }
 
 @media (min-width: 768px) {

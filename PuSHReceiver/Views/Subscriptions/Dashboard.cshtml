@@ -9,7 +9,7 @@
 
     <button type="button" class="btn btn-success" onclick="location.href='@Url.Action("Create", "Subscriptions")'">Create New</button>
     
-    <table class="table table-dark table-primary">
+    <table class="table table-dark table-primary fs-6">
         <thead>
             <tr>
                 <th scope="col">ID</th>
@@ -38,8 +38,8 @@
                     <td>@Html.DisplayFor(modelItem => item.Publisher)</td>
                     <td>@Html.DisplayFor(modelItem => item.Consumer)</td>
                     <td>
-                        <button type="button" class="btn btn-outline-warning" onclick="location.href='@Url.Action("Edit", "Subscriptions", new { @id = item.Id})'">Edit</button>
-                        <button type="button" class="btn btn-outline-secondary" onclick="location.href='@Url.Action("Details", "Subscriptions", new { @id = item.Id})'">Details</button>
+                        <button type="button" class="btn btn-outline-warning w-100" onclick="location.href='@Url.Action("Edit", "Subscriptions", new { @id = item.Id})'">Edit</button>
+                        <button type="button" class="btn btn-outline-secondary w-100" onclick="location.href='@Url.Action("Details", "Subscriptions", new { @id = item.Id})'">Details</button>
                     </td>
                 </tr>
             }

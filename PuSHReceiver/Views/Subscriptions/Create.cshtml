@@ -5,7 +5,7 @@
 @model Lease
 
 <form method="post" class="w-75">
-    <h2>@ViewData["Title"]</h2>
+    <h2 class="mb-4">@ViewData["Title"]</h2>
 
     <div class="row mb-2">
         <label class="col-2">Name: </label>
@@ -21,7 +21,7 @@
     </div>
     <div class="row mb-2">
         <label class="col-2">Active: </label>
-        @Html.CheckBoxFor(input => Model.Active, new { @class = "col-1" })
+        @Html.CheckBoxFor(input => Model.Active, new { @class = "col-1", style = "width: 30px;" })
     </div>
     <div class="row mb-2">
         <label class="col-2">Publisher: </label>
@@ -42,6 +42,6 @@
         </select>
     </div>
     <div>
-        <input type="submit" value="Create" />
+        <input type="submit" class="btn btn-primary mt-3" value="Create" />
     </div>
 </form>

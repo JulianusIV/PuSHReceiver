@@ -5,7 +5,7 @@
 @model Lease
 
 <form method="post" class="w-75">
-    <h2>@ViewData["Title"]</h2>
+    <h2 class="mb-4">@ViewData["Title"]</h2>
     @Html.HiddenFor(input => Model.Id)
     <div class="row mb-2">
         <label class="col-2">Name: </label>
@@ -21,7 +21,7 @@
     </div>
     <div class="row mb-2">
         <label class="col-2">Active: </label>
-        @Html.CheckBoxFor(input => Model.Active, new { @class = "col-1" })
+        @Html.CheckBoxFor(input => Model.Active, new { @class = "col-1", style = "width: 30px;" })
     </div>
     <div class="row mb-2">
         <label class="col-2">Publisher: </label>
@@ -41,9 +41,15 @@
             }
         </select>
     </div>
-    @Html.HiddenFor(input => Model.PublisherData)
-    @Html.HiddenFor(input => Model.ConsumerData)
+    <div class="row mb-2 input-group">
+        <label class="col-2">Publisher Data</label>
+        <textarea class="col-7 ms-1 form-control" placeholder="{}" asp-for="@Model.PublisherData" style="border-top-left-radius: 0.25rem; border-bottom-left-radius: 0.25rem;"></textarea>
+    </div>
+    <div class="row mb-2 input-group">
+        <label class="col-2">Consumer Data</label>
+        <textarea class="col-7 ms-1 form-control" placeholder="{}" asp-for="@Model.ConsumerData" style="border-top-left-radius: 0.25rem; border-bottom-left-radius: 0.25rem;"></textarea>
+    </div>
     <div>
-        <input type="submit" value="Save" />
+        <input type="submit" class="btn btn-primary mt-3" value="Save" />
     </div>
 </form>

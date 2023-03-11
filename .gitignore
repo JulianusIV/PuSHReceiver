@@ -265,10 +265,5 @@ FakesAssemblies/
 # User defined files
 config.json
 app.config
-error.txt
-settings.env
-Bulklog.txt
-/PubSubHubBubReciever/leases.json
-/PubSubHubBubReciever/data.json
 settings.runsettings
-/PubSubHubBubReciever/settings.ini
+settings.ini

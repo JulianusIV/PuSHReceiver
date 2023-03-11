@@ -81,7 +81,7 @@ namespace PuSHReceiver.Controllers
             ContentResult? result = null;
             if (response.ResponseBody is not null)
             {
-                result = Content(response.ResponseBody);
+                result = Content(response.ResponseBody, response.ResponseBody.Length.ToString());
                 result.StatusCode = (int)response.ReturnStatus;
             }
             return result is null ? StatusCode((int)response.ReturnStatus) : result;
@@ -144,7 +144,7 @@ namespace PuSHReceiver.Controllers
             ContentResult? result = null;
             if (response.ResponseBody is not null)
             {
-                result = Content(response.ResponseBody);
+                result = Content(response.ResponseBody, response.ResponseBody.Length.ToString());
                 result.StatusCode = (int)response.ReturnStatus;
             }
             return result is null ? StatusCode((int)response.ReturnStatus) : result;

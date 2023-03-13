@@ -31,6 +31,11 @@ namespace PuSHReceiver.Controllers
 
             var leases = _leaseRepo.GetLeasesByUser(user);
 
+            if (TempData.ContainsKey("SubscribeSuccess"))
+                ViewBag.SubscribeSuccess = TempData["SubscribeSuccess"];
+            else
+                ViewBag.SubscribeSuccess = true;
+
             return View(leases.ToArray());
         }
 
@@ -53,8 +58,8 @@ namespace PuSHReceiver.Controllers
             _leaseRepo.CreateLease(lease);
 
             if (lease.Active)
-                _pluginManager.ResolvePlugin<IConsumerPlugin>(lease.Consumer)
-                    .SubscribeAsync(lease);
+                TempData["SubscribeSuccess"] = _pluginManager.ResolvePlugin<IConsumerPlugin>(lease.Consumer)
+                    .SubscribeAsync(lease).GetAwaiter().GetResult();
 
             return RedirectToAction("Dashboard", "Subscriptions");
         }
@@ -76,11 +81,12 @@ namespace PuSHReceiver.Controllers
         public IActionResult Edit(Lease lease)
         {
             var before = _leaseRepo.FindLease(lease.Id);
+            var activeChanged = before!.Active != lease.Active;
             _leaseRepo.UpdateLease(lease);
 
-            if (before!.Active != lease.Active)
-                _pluginManager.ResolvePlugin<IConsumerPlugin>(lease.Consumer)
-                    .SubscribeAsync(lease, lease.Active);
+            if (activeChanged)
+                TempData["SubscribeSuccess"] = _pluginManager.ResolvePlugin<IConsumerPlugin>(lease.Consumer)
+                    .SubscribeAsync(lease, lease.Active).GetAwaiter().GetResult();
 
             return RedirectToAction("Dashboard", "Subscriptions");
         }
@@ -96,8 +102,8 @@ namespace PuSHReceiver.Controllers
         {
             var lease = _leaseRepo.FindLease(id)!;
             if (lease.Active)
-                _pluginManager.ResolvePlugin<IConsumerPlugin>(lease.Consumer)
-                    .SubscribeAsync(lease, false);
+                TempData["SubscribeSuccess"] = _pluginManager.ResolvePlugin<IConsumerPlugin>(lease.Consumer)
+                    .SubscribeAsync(lease, false).GetAwaiter().GetResult();
 
             _leaseRepo.DeleteLease(id);
 

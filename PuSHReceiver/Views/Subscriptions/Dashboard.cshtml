@@ -5,6 +5,14 @@
 @model IEnumerable<Lease>
 
 <div class="table">
+    @if (!ViewBag.SubscribeSuccess)
+    {
+        <div class="alert alert-danger mt-3 ms-5 me-5" role="alert">
+            Subscribe/Unsubscribe not successful - check server logs for more info
+            <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
     <h2>@ViewData["Title"]</h2>
 
     <button type="button" class="btn btn-success mb-2" onclick="location.href='@Url.Action("Create", "Subscriptions")'" title="Create New">

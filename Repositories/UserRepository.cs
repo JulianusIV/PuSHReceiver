@@ -1,6 +1,7 @@
 ﻿using Contracts.DbContext;
 using Contracts.Repositories;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
 using Models;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -90,7 +91,7 @@ namespace Repositories
 
             try
             {
-                var user = _dbContext.Users.FirstOrDefault(x => x.UserName == username);
+                var user = _dbContext.Users.Include(user => user.Roles).FirstOrDefault(x => x.UserName == username);
                 if (user is null)
                     return null;
 
@@ -113,7 +114,7 @@ namespace Repositories
 
             try
             {
-                return _dbContext.Users.First(x => x.Id == id);
+                return _dbContext.Users.Include(user => user.Roles).First(x => x.Id == id);
             }
             finally
             {

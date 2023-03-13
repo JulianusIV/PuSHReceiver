@@ -15,13 +15,6 @@ namespace DataAccess
         public DbContext()
             => Database.Migrate();
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            //AutoInclude to ensure navigation properies get loaded from DB correctly
-            modelBuilder.Entity<Lease>().Navigation(e => e.Owner).AutoInclude();
-            modelBuilder.Entity<User>().Navigation(e => e.Roles).AutoInclude();
-        }
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
             => optionsBuilder.UseMySql(ConfigurationManager.DbConfig.ConnectionString, ServerVersion.AutoDetect(ConfigurationManager.DbConfig.ConnectionString));
     }

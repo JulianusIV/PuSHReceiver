@@ -89,7 +89,7 @@ namespace PuSHReceiver.Controllers
 
         [HttpPost]
         [Route("{topicId}")]
-        [Consumes("application/xml")]
+        [Consumes("application/xml", "application/json")]
         public IActionResult Post([FromRoute] int topicId)
         {
             _logger.LogDebug("Recieved HTTPPost in {Controller} with TopicId {TopicId}.", nameof(RecieverController), topicId);

@@ -26,11 +26,16 @@ namespace DefaultPlugins.TwitchConsumer
 
         public Response HandlePost(Lease lease, Request request)
         {
+            Logger!.LogWarning("Incoming POST request for twitch plugin\nRequest:\n{}", request);
+
             var data = lease.GetObjectFromConsumerString<DefaultTwitchConsPluginData>();
             if (data is null)
                 return new Response() { ReturnStatus = HttpStatusCode.InternalServerError };
 
             if (request.Body is null)
+                return new Response() { ReturnStatus = HttpStatusCode.BadRequest };
+
+            if (!request.Headers.ContainsKey("Twitch-Eventsub-Message-Signature"))
                 return new Response() { ReturnStatus = HttpStatusCode.BadRequest };
 
             var headerHash = request.Headers["Twitch-Eventsub-Message-Signature"].ToString().Replace("sha256=", "");

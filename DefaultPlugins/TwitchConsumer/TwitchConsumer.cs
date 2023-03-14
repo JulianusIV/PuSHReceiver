@@ -97,6 +97,9 @@ namespace DefaultPlugins.TwitchConsumer
 
         public async Task<bool> SubscribeAsync(Lease lease, bool subscribe = true)
         {
+            if (!subscribe) 
+                return true;
+
             var data = lease.GetObjectFromConsumerString<DefaultTwitchConsPluginData>();
             if (data is null)
                 return false;
@@ -110,19 +113,22 @@ namespace DefaultPlugins.TwitchConsumer
                 HttpRequestMessage request = new(HttpMethod.Post, @"https://api.twitch.tv/helix/eventsub/subscriptions")
                 {
                     Content = new StringContent($$"""
-                         {"type":"stream.online","version":"1","condition":{"broadcaster_user_id":"{{lease.TopicUrl}}"},"transport":{"method":"webhook","callback":"{{lease.GetCallbackUrl()}}","secret","{{data.Secret}}"
+                         {"type":"stream.online","version":"1","condition":{"broadcaster_user_id":"{{lease.TopicUrl}}"},"transport":{"method":"webhook","callback":"{{lease.GetCallbackUrl()}}","secret":"{{data.Secret}}"} }
                          """, Encoding.UTF8, "application/json")
                 };
 
-                var token = await GetAccessToken(data);
-                request.Headers.Authorization = new AuthenticationHeaderValue(token.TokenType, token.AccessToken);
-                //TODO pass some config to plugins
+                var token = await GetAccessToken(data, trys > 0);
+                request.Headers.Authorization = new AuthenticationHeaderValue(
+                    string.Concat(token.TokenType[0].ToString().ToUpper(), token.TokenType.AsSpan(1)), 
+                    token.AccessToken);
                 request.Headers.Add("Client-Id", data.ClientId);
 
                 var response = await client.SendAsync(request);
+
                 isSuccess = response.IsSuccessStatusCode;
                 trys++;
             } while (!isSuccess && trys < 3);
+
             return isSuccess;
         }
 

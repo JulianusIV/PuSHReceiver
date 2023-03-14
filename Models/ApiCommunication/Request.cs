@@ -1,6 +1,4 @@
-﻿using System.Reflection.PortableExecutable;
-
-namespace Models.ApiCommunication
+﻿namespace Models.ApiCommunication
 {
     public class Request
     {

@@ -35,12 +35,12 @@ namespace DefaultPlugins.TwitchConsumer
             if (request.Body is null)
                 return new Response() { ReturnStatus = HttpStatusCode.BadRequest };
 
-            if (!request.Headers.ContainsKey("Twitch-Eventsub-Message-Signature"))
+            if (!request.Headers.ContainsKey("twitch-eventsub-message-signature"))
                 return new Response() { ReturnStatus = HttpStatusCode.BadRequest };
 
-            var headerHash = request.Headers["Twitch-Eventsub-Message-Signature"].ToString().Replace("sha256=", "");
+            var headerHash = request.Headers["twitch-eventsub-message-signature"].ToString().Replace("sha256=", "");
 
-            byte[] bytes = Encoding.UTF8.GetBytes(request.Body);
+            byte[] bytes = Encoding.UTF8.GetBytes(request.Headers["twitch-eventsub-message-id"] + request.Headers["twitch-eventsub-message-timestamp"] + request.Body);
             var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(data.Secret));
             if (hmac is null)
                 return new Response() { ReturnStatus = HttpStatusCode.InternalServerError };
@@ -51,10 +51,10 @@ namespace DefaultPlugins.TwitchConsumer
             if (headerHash != hashString)
                 return new Response() { ReturnStatus = HttpStatusCode.Unauthorized };
 
-            if (!request.Headers.ContainsKey("Twitch-Eventsub-Message-Type"))
+            if (!request.Headers.ContainsKey("twitch-eventsub-message-type"))
                 return new Response() { ReturnStatus = HttpStatusCode.Forbidden };
 
-            var messageType = request.Headers["Twitch-Eventsub-Message-Type"];
+            var messageType = request.Headers["twitch-eventsub-message-type"];
 
             switch (messageType)
             {

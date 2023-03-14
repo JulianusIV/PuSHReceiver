@@ -56,9 +56,9 @@ namespace PuSHReceiver.Controllers
             //build object for passing request to plugin
             var request = new Request();
             foreach (var param in Request.Query)
-                request.QueryParameters.Add(param.Key, param.Value!);
+                request.QueryParameters.Add(param.Key.ToLower(), param.Value!);
             foreach (var header in Request.Headers)
-                request.Headers.Add(header.Key, header.Value!);
+                request.Headers.Add(header.Key.ToLower(), header.Value!);
             //pass request to plugin
             var response = consumer.HandleGet(topic, request);
 
@@ -114,9 +114,9 @@ namespace PuSHReceiver.Controllers
             //build object for passing request to plugin
             var request = new Request();
             foreach (var param in Request.Query)
-                request.QueryParameters.Add(param.Key, param.Value!);
+                request.QueryParameters.Add(param.Key.ToLower(), param.Value!);
             foreach (var header in Request.Headers)
-                request.Headers.Add(header.Key, header.Value!);
+                request.Headers.Add(header.Key.ToLower(), header.Value!);
             if (Request.Body is not null)
             {
                 using var sr = new StreamReader(Request.Body);

@@ -113,10 +113,11 @@ namespace DefaultPlugins.TwitchConsumer
                          {"type":"stream.online","version":"1","condition":{"broadcaster_user_id":"{{lease.TopicUrl}}"},"transport":{"method":"webhook","callback":"{{lease.GetCallbackUrl()}}","secret","{{data.Secret}}"
                          """, Encoding.UTF8, "application/json")
                 };
-                var token = await GetAccessToken();
+
+                var token = await GetAccessToken(data);
                 request.Headers.Authorization = new AuthenticationHeaderValue(token.TokenType, token.AccessToken);
                 //TODO pass some config to plugins
-                request.Headers.Add("Client-Id", Environment.GetEnvironmentVariable("TWITCH_CLIENT_ID"));
+                request.Headers.Add("Client-Id", data.ClientId);
 
                 var response = await client.SendAsync(request);
                 isSuccess = response.IsSuccessStatusCode;
@@ -125,7 +126,7 @@ namespace DefaultPlugins.TwitchConsumer
             return isSuccess;
         }
 
-        private async Task<TwitchTokenResponse> GetAccessToken(bool useCache = true)
+        private async Task<TwitchTokenResponse> GetAccessToken(DefaultTwitchConsPluginData data, bool useCache = true)
         {
             if (useCache && !string.IsNullOrEmpty(_token.AccessToken) && _token.GrantedAt + TimeSpan.FromSeconds(_token.ExpiresInSeconds) > DateTime.Now)
                 return _token;
@@ -136,8 +137,8 @@ namespace DefaultPlugins.TwitchConsumer
             {
                 Content = new FormUrlEncodedContent(new Dictionary<string, string>
                 {
-                    { "client_id", Environment.GetEnvironmentVariable("TWITCH_CLIENT_ID")! },
-                    { "client_secret", Environment.GetEnvironmentVariable("TWITCH_CLIENT_SECRET")! },
+                    { "client_id", data.ClientId },
+                    { "client_secret", data.ClientSecret },
                     { "grant_type", "client_credentials" }
                 })
             };

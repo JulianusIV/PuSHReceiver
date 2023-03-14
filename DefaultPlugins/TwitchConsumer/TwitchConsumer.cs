@@ -127,8 +127,12 @@ namespace DefaultPlugins.TwitchConsumer
 
                 isSuccess = response.IsSuccessStatusCode;
                 trys++;
-            } while (!isSuccess && trys < 3);
 
+                if (!isSuccess)
+                    Logger!.LogWarning("Request to Twitch failed with response content: {}\nOn try {}", await response.Content.ReadAsStringAsync(), trys);
+            } while (!isSuccess && trys < 3);
+            if (!isSuccess)
+                Logger!.LogError("Request to twitch failed after 3 trys");
             return isSuccess;
         }
 

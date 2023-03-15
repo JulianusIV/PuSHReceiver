@@ -101,7 +101,7 @@ namespace DefaultPlugins.YouTubeConsumer
             }
 
             //get hash from request header
-            var headerHash = request.Headers["X-Hub-Signature"].ToString().Replace("sha1=", "");
+            var headerHash = request.Headers["x-hub-signature"].ToString().Replace("sha1=", "");
             //get bytes from request body
             byte[] bytes = Encoding.UTF8.GetBytes(request.Body);
             //create hashing generator

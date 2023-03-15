@@ -48,7 +48,7 @@ namespace DefaultPlugins.TwitchConsumer.TwitchApiModels
     public class Event
     {
         [JsonPropertyName("id")]
-        public int Id { get; set; }
+        public string Id { get; set; } = string.Empty;
         [JsonPropertyName("broadcaster_user_id")]
         public string BroadcasterUserId { get; set; } = string.Empty;
         [JsonPropertyName("broadcaster_user_login")]

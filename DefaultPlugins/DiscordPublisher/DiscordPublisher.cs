@@ -57,7 +57,7 @@ namespace DefaultPlugins.DiscordPublisher
                 return;
             //create request body
             string content = $"{{\"username\": \"{pluginData.PubName}\", " +
-                $"\"content\": \"{Regex.Unescape(pluginData.PubText) + " " + itemUrl}\", " +
+                $"\"content\": \"{Regex.Unescape(pluginData.PubText) + "\\n" + itemUrl}\", " +
                 $"\"avatar_url\": \"{pluginData.PubPfp}\"}}";
 
             //send request

@@ -67,7 +67,8 @@ namespace DefaultPlugins.TwitchConsumer
                     {
                         ItemUrl = $"https://www.twitch.tv/{notifPayload.Event.BroadcasterUserName}",
                         ReturnStatus = HttpStatusCode.OK,
-                        Username = notifPayload.Event.BroadcasterUserName
+                        Username = notifPayload.Event.BroadcasterUserName,
+                        EventId = notifPayload.Event.Id.ToString()
                     };
                 case "webhook_callback_verification":
                     var verifyPayload = JsonSerializer.Deserialize<TwitchCallbackVerificationJson>(request.Body);

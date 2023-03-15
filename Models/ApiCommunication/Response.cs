@@ -9,6 +9,7 @@ namespace Models.ApiCommunication
         public string ResponseBody { get; set; } = string.Empty;
         public string Username { get; set; } = string.Empty;
         public string ItemUrl { get; set; } = string.Empty;
+        public string EventId { get; set; } = string.Empty;
         public string[] Args { get; set; } = Array.Empty<string>();
         public bool IsSuccessStatusCode => ((int)ReturnStatus >= 200) && ((int)ReturnStatus <= 299);
     }

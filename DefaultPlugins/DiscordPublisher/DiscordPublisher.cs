@@ -30,16 +30,16 @@ namespace DefaultPlugins.DiscordPublisher
             _lastPublishes = jsonObject;
         }
 
-        public async Task PublishAsync(Lease lease, string user, string itemUrl, params string[] args)
+        public async Task PublishAsync(Lease lease, string user, string itemUrl, string eventId, params string[] args)
         {
             //check cache and populate if new
             if (_lastPublishes.ContainsKey(lease.Id))
             {
-                if (_lastPublishes[lease.Id].Contains(itemUrl))
+                if (_lastPublishes[lease.Id].Contains(eventId))
                     return;
                 else
                 {
-                    _lastPublishes[lease.Id].Enqueue(itemUrl);
+                    _lastPublishes[lease.Id].Enqueue(eventId);
                     if (_lastPublishes[lease.Id].Count > 12)
                         _lastPublishes[lease.Id].Dequeue();
                 }
@@ -47,7 +47,7 @@ namespace DefaultPlugins.DiscordPublisher
             else
             {
                 var queue = new Queue<string>();
-                queue.Enqueue(itemUrl);
+                queue.Enqueue(eventId);
                 _lastPublishes.Add(lease.Id, queue);
             }
 

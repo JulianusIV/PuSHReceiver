@@ -65,7 +65,7 @@ namespace PuSHReceiver.Controllers
             //if plugin states request was not a challenge pass to publisherplugin
             if (response.IsSuccessStatusCode && !response.Challenge)
                 _pluginManager.ResolvePlugin<IPublisherPlugin>(topic.Publisher)
-                    .PublishAsync(topic, response.Username, response.ItemUrl, response.Args);
+                    .PublishAsync(topic, response.Username, response.ItemUrl, response.EventId, response.Args);
 
             if (response.Challenge)
             {

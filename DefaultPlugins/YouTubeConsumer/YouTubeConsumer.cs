@@ -134,6 +134,7 @@ namespace DefaultPlugins.YouTubeConsumer
             response.ItemUrl = xml.entry.link.href;
             response.Username = xml.entry.author.name;
             response.ReturnStatus = HttpStatusCode.OK;
+            response.EventId = xml.entry.link.href;
 
             return response;
         }

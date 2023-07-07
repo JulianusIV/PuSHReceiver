@@ -63,6 +63,9 @@ namespace DefaultPlugins.TwitchConsumer
                     if (notifPayload is null)
                         return new Response() { ReturnStatus = HttpStatusCode.InternalServerError };
 
+                    if (DateTime.Parse(request.Headers["twitch-eventsub-message-signature"]) < DateTime.Now - TimeSpan.FromMinutes(10))
+                        return new Response() { ReturnStatus = HttpStatusCode.BadRequest };
+
                     return new Response()
                     {
                         ItemUrl = $"https://www.twitch.tv/{notifPayload.Event.BroadcasterUserName}",

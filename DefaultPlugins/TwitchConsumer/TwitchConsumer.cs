@@ -21,7 +21,7 @@ namespace DefaultPlugins.TwitchConsumer
         public IPluginRepository? PluginRepository { get; set; }
         public ILogger? Logger { get; set; }
 
-        public Response HandleGet(Lease lease, Request request) 
+        public Response HandleGet(Lease lease, Request request)
             => throw new NotImplementedException("This should not be called!");
 
         public Response HandlePost(Lease lease, Request request)
@@ -103,12 +103,18 @@ namespace DefaultPlugins.TwitchConsumer
 
         public async Task<bool> SubscribeAsync(Lease lease, bool subscribe = true)
         {
-            if (!subscribe) 
+            if (!subscribe)
                 return true;
 
             var data = lease.GetObjectFromConsumerString<DefaultTwitchConsPluginData>();
             if (data is null)
                 return false;
+
+            if (!subscribe)
+            {
+                await UnsubscribeAsync(data, lease);
+                return true;
+            }
 
             bool isSuccess;
             int trys = 0;
@@ -125,7 +131,7 @@ namespace DefaultPlugins.TwitchConsumer
 
                 var token = await GetAccessToken(data, trys > 0);
                 request.Headers.Authorization = new AuthenticationHeaderValue(
-                    string.Concat(token.TokenType[0].ToString().ToUpper(), token.TokenType.AsSpan(1)), 
+                    string.Concat(token.TokenType[0].ToString().ToUpper(), token.TokenType.AsSpan(1)),
                     token.AccessToken);
                 request.Headers.Add("Client-Id", data.ClientId);
 
@@ -140,6 +146,48 @@ namespace DefaultPlugins.TwitchConsumer
             if (!isSuccess)
                 Logger!.LogError("Request to twitch failed after 3 trys");
             return isSuccess;
+        }
+
+        private async Task UnsubscribeAsync(DefaultTwitchConsPluginData data, Lease lease)
+        {
+            var subs = await GetActiveSubscriptionsAsync(data);
+
+            foreach (var sub in subs.Data.Where(x => x.Condition.BroadcasterUserId == lease.TopicUrl))
+                _ = DeleteActiveSubscriptionAsync(data, sub.Id);
+        }
+
+        private async Task<TwitchSubscriptionList> GetActiveSubscriptionsAsync(DefaultTwitchConsPluginData data)
+        {
+            using HttpClient client = new();
+
+            HttpRequestMessage request = new(HttpMethod.Get, @"https://api.twitch.tv/helix/eventsub/subscriptions");
+
+            var token = await GetAccessToken(data, false);
+            request.Headers.Authorization = new AuthenticationHeaderValue(
+                string.Concat(token.TokenType[0].ToString().ToUpper(), token.TokenType.AsSpan(1)),
+                token.AccessToken);
+            request.Headers.Add("Client-Id", data.ClientId);
+
+            var response = await client.SendAsync(request);
+
+            var body = await response.Content.ReadAsStringAsync();
+
+            return JsonSerializer.Deserialize<TwitchSubscriptionList>(body) ?? new();
+        }
+
+        private async Task DeleteActiveSubscriptionAsync(DefaultTwitchConsPluginData data, string id)
+        {
+            using HttpClient client = new();
+
+            HttpRequestMessage request = new(HttpMethod.Delete, @"https://api.twitch.tv/helix/eventsub/subscriptions?id=" + id);
+
+            var token = await GetAccessToken(data, true);
+            request.Headers.Authorization = new AuthenticationHeaderValue(
+                string.Concat(token.TokenType[0].ToString().ToUpper(), token.TokenType.AsSpan(1)),
+                token.AccessToken);
+            request.Headers.Add("Client-Id", data.ClientId);
+
+            await client.SendAsync(request);
         }
 
         private async Task<TwitchTokenResponse> GetAccessToken(DefaultTwitchConsPluginData data, bool useCache = true)

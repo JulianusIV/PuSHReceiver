@@ -40,7 +40,7 @@ namespace DefaultPlugins.DiscordPublisher
                 else
                 {
                     _lastPublishes[lease.Id].Enqueue(eventId);
-                    if (_lastPublishes[lease.Id].Count > 12)
+                    if (_lastPublishes[lease.Id].Count > 20)
                         _lastPublishes[lease.Id].Dequeue();
                 }
             }

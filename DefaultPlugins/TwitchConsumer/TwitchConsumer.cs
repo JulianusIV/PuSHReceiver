@@ -26,8 +26,6 @@ namespace DefaultPlugins.TwitchConsumer
 
         public Response HandlePost(Lease lease, Request request)
         {
-            Logger!.LogWarning("Incoming POST request for twitch plugin\nRequest:\n{}", request);
-
             var data = lease.GetObjectFromConsumerString<DefaultTwitchConsPluginData>();
             if (data is null)
                 return new Response() { ReturnStatus = HttpStatusCode.InternalServerError };

@@ -130,6 +130,13 @@ namespace DefaultPlugins.YouTubeConsumer
                 response.ReturnStatus = HttpStatusCode.InternalServerError;
                 return response;
             }
+
+            if (xml.entry.published < DateTime.Now - TimeSpan.FromHours(3))
+            {
+                response.ReturnStatus = HttpStatusCode.Conflict; 
+                return response;
+            }
+
             //set properties to pass to publisher
             response.ItemUrl = xml.entry.link.href;
             response.Username = xml.entry.author.name;

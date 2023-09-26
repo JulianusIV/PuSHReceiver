@@ -12,6 +12,8 @@ namespace DefaultPlugins.DiscordPublisher
     {
         //cache to avoid duplicates
         private Dictionary<int, Queue<string>> _lastPublishes = new();
+        private static SemaphoreSlim _semaphore = new SemaphoreSlim(1);
+
         //plugin name for resolving plugin
         public string Name => "Default_DiscordPublisher";
         //DI
@@ -32,6 +34,8 @@ namespace DefaultPlugins.DiscordPublisher
 
         public async Task PublishAsync(Lease lease, string user, string itemUrl, string eventId, params string[] args)
         {
+            await _semaphore.WaitAsync();
+
             //check cache and populate if new
             if (_lastPublishes.ContainsKey(lease.Id))
             {
@@ -50,6 +54,8 @@ namespace DefaultPlugins.DiscordPublisher
                 queue.Enqueue(eventId);
                 _lastPublishes.Add(lease.Id, queue);
             }
+
+            _semaphore.Release();
 
             //transform plugin data stored in Lease object as json
             var pluginData = lease.GetObjectFromPublisherString<DefaultDiscordPubPluginData>();

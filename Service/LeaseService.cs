@@ -33,7 +33,7 @@ namespace Service
             //fetch appropriate timer, stop if running, set properties and run
             var timer = GetTimer(lease);
             timer.Stop();
-            timer.Interval = leaseTimespan.TotalMilliseconds;
+            timer.Interval = leaseTimespan.TotalMilliseconds > 0 ? leaseTimespan.TotalMilliseconds : 0;
             timer.AutoReset = false;
             timer.Start();
         }

@@ -11,6 +11,8 @@ namespace DataAccess
         public DbSet<User> Users => Set<User>();
         public DbSet<Role> Roles => Set<Role>();
 
+        public DbSet<Log> Logs => Set<Log>();
+
         //ensure latest migration is applied to the current db
         public DbContext()
             => Database.Migrate();

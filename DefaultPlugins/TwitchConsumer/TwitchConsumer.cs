@@ -19,6 +19,7 @@ namespace DefaultPlugins.TwitchConsumer
         public string Name => "Default_TwitchConsumer";
 
         public IPluginRepository? PluginRepository { get; set; }
+        public ILogRepository? LogRepository { get; set; }
         public ILogger? Logger { get; set; }
 
         public Response HandleGet(Lease lease, Request request)
@@ -57,6 +58,7 @@ namespace DefaultPlugins.TwitchConsumer
             switch (messageType)
             {
                 case "notification":
+                    LogRepository!.CreateLogEntry(new Log(DateTime.Now, request.Body));
                     var notifPayload = JsonSerializer.Deserialize<TwitchNotificationJson>(request.Body);
                     if (notifPayload is null)
                         return new Response() { ReturnStatus = HttpStatusCode.InternalServerError };

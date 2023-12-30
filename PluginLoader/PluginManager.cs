@@ -15,15 +15,17 @@ namespace PluginLoader
         private Dictionary<IPublisherPlugin, Type?> _publisherPlugins;
         private readonly ILogger<PluginManager> _logger;
         private readonly IPluginRepository _pluginRepository;
+        private readonly ILogRepository _logRepository;
 
         //disable nullable warning - non nullable properties are set in ReloadPlugins method
 #pragma warning disable CS8618
-        public PluginManager(ILogger<PluginManager> logger, IPluginRepository pluginRepository)
+        public PluginManager(ILogger<PluginManager> logger, IPluginRepository pluginRepository, ILogRepository logRepository)
         {
             _logger = logger;
             _pluginRepository = pluginRepository;
             //populate plugin dictionaries
             ReloadPlugins();
+            _logRepository = logRepository;
         }
 #pragma warning restore CS8618
 
@@ -136,6 +138,8 @@ namespace PluginLoader
                 }
                 //DI into plugin
                 plugin.PluginRepository = _pluginRepository;
+                if (interfaceType == typeof(IConsumerPlugin))
+                    ((IConsumerPlugin)plugin).LogRepository = _logRepository;
                 plugin.Logger = _logger;
                 //asyncronously call init
                 _ = plugin.InitAsync();

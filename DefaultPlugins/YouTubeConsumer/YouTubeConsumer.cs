@@ -16,6 +16,7 @@ namespace DefaultPlugins.YouTubeConsumer
         public string Name => "Default_YoutubeConsumer";
         //DI
         public IPluginRepository? PluginRepository { get; set; }
+        public ILogRepository? LogRepository { get; set; }
         public ILogger? Logger { get; set; }
 
         public Response HandleGet(Lease lease, Request request)
@@ -91,6 +92,7 @@ namespace DefaultPlugins.YouTubeConsumer
                 response.ReturnStatus = HttpStatusCode.BadRequest;
                 return response;
             }
+            LogRepository!.CreateLogEntry(new Log(DateTime.Now, request.Body));
 
             //transform plugin data saved in lease object as json
             var data = lease.GetObjectFromConsumerString<DefaultYouTubeConsPluginData>();

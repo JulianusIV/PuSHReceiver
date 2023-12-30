@@ -38,6 +38,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddTransient<IDbContext, DbContext>();
 builder.Services.AddTransient<ILeaseRepository, LeaseRepository>();
 builder.Services.AddTransient<IPluginRepository, PluginRepository>();
+builder.Services.AddTransient<ILogRepository, LogRepository>();
 builder.Services.AddTransient<IUserRepository, UserRepository>();
 builder.Services.AddSingleton<IPluginManager, PluginManager>();
 builder.Services.AddSingleton<ILeaseService, LeaseService>();

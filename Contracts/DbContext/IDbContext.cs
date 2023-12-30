@@ -8,6 +8,7 @@ namespace Contracts.DbContext
         public DbSet<Lease> Leases { get; }
         public DbSet<User> Users { get; }
         public DbSet<Role> Roles { get; }
+        public DbSet<Log> Logs { get; }
         public int SaveChanges();
     }
 }

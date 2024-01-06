@@ -92,7 +92,7 @@ namespace DefaultPlugins.YouTubeConsumer
                 response.ReturnStatus = HttpStatusCode.BadRequest;
                 return response;
             }
-            LogRepository!.CreateLogEntry(new Log(DateTime.Now, request.Body));
+            //LogRepository!.CreateLogEntry(new Log(DateTime.Now, request.Body));
 
             //transform plugin data saved in lease object as json
             var data = lease.GetObjectFromConsumerString<DefaultYouTubeConsPluginData>();
@@ -133,11 +133,11 @@ namespace DefaultPlugins.YouTubeConsumer
                 return response;
             }
 
-            if (xml.entry.published < DateTime.Now - TimeSpan.FromHours(3))
-            {
-                response.ReturnStatus = HttpStatusCode.Conflict; 
-                return response;
-            }
+            //if (xml.entry.published < DateTime.Now - TimeSpan.FromHours(3))
+            //{
+            //    response.ReturnStatus = HttpStatusCode.Conflict; 
+            //    return response;
+            //}
 
             //set properties to pass to publisher
             response.ItemUrl = xml.entry.link.href;

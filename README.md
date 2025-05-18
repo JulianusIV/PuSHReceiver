@@ -3,6 +3,9 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/julianusiv/pushreceiver/badge)](https://www.codefactor.io/repository/github/julianusiv/pushreceiver)
 [![Run MSTest](https://github.com/JulianusIV/PubSubHubBubReciever/actions/workflows/run-mstest.yml/badge.svg)](https://github.com/JulianusIV/PubSubHubBubReciever/actions/workflows/run-mstest.yml)
 
+DUE TO INCONSISTENCIES WITH THE IMPLEMENTATION OF PuSH ON APPSPOT I HAVE DECIDED TO ARCHIVE THIS REPOSITORY. 
+IF YOU NEED A WAY TO SEND UPLOAD NOTIFICATIONS TO DISCORD FROM YOUTUBE SPECIFICALLY I RECOMMEND CHECKING OUT THE [SAPPHIRE BOT](https://sapph.xyz/).
+
 # PubSubHubBubReciever
 
 **An ASP.NET Core API to consume PuSH notifications from Google's [PubSubHubBub](https://pubsubhubbub.appspot.com) Protocol, and send them for example to a [Discord webhook](https://discord.com/developers/docs/resources/webhook#execute-webhook).**
